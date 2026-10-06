@@ -3,6 +3,10 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Apuntes personales de estudio (no se suben a GitHub)
+docs/APUNTES.md
+docs/APUNTES.pdf
+
 # dotenv files
 .env
 
