@@ -52,7 +52,8 @@ namespace SecretParty.Controllers
             await _db.SaveChangesAsync();
 
             await IniciarSesion(usuario);
-            return RedirectToAction("Index", "Home");
+            // Recién registrado -> "configura tu nueva cuenta"
+            return RedirectToAction("Editar", "Perfil");
         }
 
         // ---------- LOGIN ----------
@@ -84,7 +85,7 @@ namespace SecretParty.Controllers
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 return Redirect(model.ReturnUrl);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Perfil");
         }
 
         // ---------- LOGOUT ----------

@@ -1,0 +1,32 @@
+@model SecretParty.Models.Usuario
+
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<h1>Hola <em>@Model.NombreUsuario!</em></h1>
+
+<section class="perfil-tarjeta">
+    <h2>@Model.NombreUsuario</h2>
+    <p>@Model.Descripcion</p>
+
+    <dl>
+        <dt>Email</dt>
+        <dd>@Model.Email</dd>
+
+        <dt>Intereses</dt>
+        <dd>@Model.Intereses</dd>
+
+        <dt>Instagram</dt>
+        <dd>@Model.Instagram</dd>
+
+        <dt>Miembro desde</dt>
+        <dd>@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
+    </dl>
+
+    <a asp-action="Editar" class="btn btn-primary">✏️ Editar perfil</a>
+</section>
+
+<p class="mt-4">
+    <a asp-action="Eliminar" class="text-danger">Eliminar mi cuenta</a>
+</p>

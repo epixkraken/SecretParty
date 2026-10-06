@@ -1,0 +1,16 @@
+@model SecretParty.Models.Usuario
+@{
+    ViewData["Title"] = "Eliminar cuenta";
+}
+
+<h1>¿Segura que quieres <em>irte?</em></h1>
+
+<section class="perfil-tarjeta">
+    <p>Vas a eliminar la cuenta <strong>@Model.NombreUsuario</strong> (@Model.Email).</p>
+    <p>Esto no se puede deshacer.</p>
+
+    <form asp-action="Eliminar" method="post">
+        <button type="submit" class="btn btn-danger">Sí, eliminar mi cuenta</button>
+        <a asp-action="Index" class="btn btn-link">No, regresar</a>
+    </form>
+</section>
