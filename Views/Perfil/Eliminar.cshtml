@@ -3,14 +3,16 @@
     ViewData["Title"] = "Eliminar cuenta";
 }
 
-<h1>¿Segura que quieres <em>irte?</em></h1>
+<h1 class="titulo">¿Segura que quieres <em>irte?</em></h1>
 
-<section class="perfil-tarjeta">
+<section class="tarjeta">
     <p>Vas a eliminar la cuenta <strong>@Model.NombreUsuario</strong> (@Model.Email).</p>
-    <p>Esto no se puede deshacer.</p>
+    <p>Esto <strong>no se puede deshacer</strong>.</p>
 
-    <form asp-action="Eliminar" method="post">
-        <button type="submit" class="btn btn-danger">Sí, eliminar mi cuenta</button>
-        <a asp-action="Index" class="btn btn-link">No, regresar</a>
-    </form>
+    <div class="acciones">
+        <form asp-action="Eliminar" method="post" class="form-en-linea">
+            <button type="submit" class="boton boton-borde boton-chico link-peligro">Sí, eliminar mi cuenta</button>
+        </form>
+        <a asp-action="Index" class="boton boton-lila boton-chico">No, regresar</a>
+    </div>
 </section>

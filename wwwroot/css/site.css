@@ -1,31 +1,525 @@
-html {
-  font-size: 14px;
+/* =========================================================
+   SECRET PARTY — Hoja de estilos
+   Diseño "mobile first": primero escribimos el estilo para
+   celular y al final, con @media, lo agrandamos para compu.
+   ========================================================= */
+
+
+/* ---------- 1. VARIABLES (los colores del Figma) ----------
+   Se guardan una sola vez aquí y se usan con var(--nombre).
+   Si un día cambias el lila, lo cambias solo en este lugar. */
+:root {
+    --lila: #D6C9FE;
+    --lila-fuerte: #B9A3FC;  /* un poquito más oscuro, para que el texto lila se lea */
+    --verde: #E0FECA;
+    --amarillo: #FDFDC7;
+    --blanco: #FFFFFF;
+    --texto: #120000;
+    --placeholder: rgba(55, 55, 55, 0.76); /* #373737 al 76% */
+    --borde: #000000;
+    --error: #D33F49;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
+/* ---------- 2. BASE ---------- */
 
-html {
-  position: relative;
-  min-height: 100%;
+/* box-sizing: border-box hace que el padding y el borde
+   queden DENTRO del ancho que le das, y no se sumen. */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    min-height: 100vh;            /* 100vh = el alto completo de la pantalla */
+    font-family: 'Poppins', Arial, sans-serif;
+    color: var(--texto);
+    background-color: var(--blanco);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* El fondo de iconos (notas, lunas, estrellas...) */
+.fondo-patron {
+    background-color: #F4F3F7;
+    background-image: url('../img/fondo-patron.jpg');
+    background-size: 900px auto;  /* tamaño de cada "azulejo" */
+    background-repeat: repeat;    /* se repite como mosaico y llena cualquier pantalla */
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.fondo-blanco {
+    background-color: var(--blanco);
+}
+
+/* El mismo blanquito del patrón, pero liso (sin iconos) */
+.fondo-liso {
+    background-color: #F4F3F7;
+}
+
+/* La "pantalla": una columna centrada, como el celular del Figma */
+.pantalla {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;               /* auto a los lados = centrado */
+    padding: 32px 20px 48px;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Los logos tienen fondo blanco. "multiply" mezcla la imagen con lo que
+   está detrás: el blanco se vuelve "transparente" y se ve el patrón. */
+.inicio-logo,
+.logo-arriba {
+    mix-blend-mode: multiply;
+}
+
+a {
+    color: inherit;
+}
+
+/* Las palabras destacadas: "nueva cuenta", "Chloe!", "Sign Up"... */
+em,
+.destacado {
+    color: var(--lila-fuerte);
+    font-style: italic;
+    font-weight: 700;
+}
+
+
+/* ---------- 3. TÍTULOS ---------- */
+.titulo {
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 24px;
+    /* Un "halo" del color del fondo alrededor de las letras,
+       para que los iconos del patrón no se mezclen con el título */
+    text-shadow: 0 0 6px #F4F3F7, 0 0 12px #F4F3F7, 0 0 18px #F4F3F7;
+}
+
+.centrado {
+    text-align: center;
+}
+
+
+/* ---------- 4. LOGOS ---------- */
+.logo-arriba {
+    display: block;
+    width: 160px;
+    margin: 0 auto 16px;
+}
+
+
+/* ---------- 5. TARJETAS ---------- */
+.tarjeta {
+    background-color: var(--blanco);
+    border-radius: 11px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* La tarjeta del login/registro, con el patrón de fondo.
+   Se pueden poner DOS fondos separados por coma: el primero queda encima.
+   Arriba va una capa blanca al 55% para que los iconos no tapen las letras. */
+.tarjeta-patron {
+    background-color: #F4F3F7;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)),
+        url('../img/fondo-patron.jpg');
+    background-size: auto, 700px auto;
+    border-radius: 31px;
+    padding: 28px 24px;
+    margin-bottom: 24px;
+}
+
+/* La tarjeta verde de "configura tu nueva cuenta" */
+.tarjeta-verde {
+    background-color: var(--verde);
+    border-radius: 31px;
+    padding: 28px 24px;
+    margin-bottom: 24px;
+}
+
+
+/* ---------- 6. FORMULARIOS ---------- */
+.campo {
+    margin-bottom: 16px;
+}
+
+.campo label {
+    display: block;               /* el label ocupa su propia línea, arriba del input */
+    font-size: 16px;
+    margin: 0 0 6px 12px;
+}
+
+.input {
+    display: block;
+    width: 100%;
+    height: 52px;
+    padding: 0 20px;
+    font-family: inherit;         /* los inputs NO heredan la letra solos; hay que pedírselo */
+    font-size: 14px;
+    color: var(--texto);
+    background-color: var(--blanco);
+    border: 2.5px solid var(--borde);
+    border-radius: 25px;
+    outline: none;
+}
+
+.input::placeholder {
+    color: var(--placeholder);
+}
+
+/* :focus = cuando estás escribiendo en ese input */
+.input:focus {
+    box-shadow: 0 0 0 4px var(--lila);
+}
+
+/* En la tarjeta verde, los inputs van blancos y sin borde */
+.tarjeta-verde .input {
+    border: none;
+}
+
+/* El textarea de la descripción es más alto */
+textarea.input {
+    height: 78px;
+    padding: 14px 20px;
+    resize: vertical;
+}
+
+/* ASP.NET le pone esta clase al input que tiene un error */
+.input.input-validation-error {
+    border-color: var(--error);
+}
+
+.error,
+.field-validation-error {
+    display: block;
+    color: var(--error);
+    font-size: 13px;
+    margin: 4px 0 0 12px;
+}
+
+/* Si no hay errores, el resumen no se muestra */
+.validation-summary-valid {
+    display: none;
+}
+
+.validation-summary-errors ul {
+    margin: 0 0 12px;
+    padding-left: 18px;
+}
+
+.nota {
+    font-size: 14px;
+    font-style: italic;
+    margin: 0 0 8px 12px;
+}
+
+
+/* ---------- 7. BOTONES TIPO PASTILLA ---------- */
+.boton {
+    display: inline-block;
+    min-width: 182px;
+    padding: 4px 24px;
+    font-family: inherit;
+    font-size: 24px;
+    color: var(--texto);
+    text-align: center;
+    text-decoration: none;        /* quita el subrayado de los links */
+    border: none;
+    border-radius: 45px;          /* esquinas MUY redondas = pastilla */
+    cursor: pointer;              /* la manito al pasar el mouse */
+    transition: transform 0.15s, filter 0.15s;
+}
+
+/* :hover = cuando pasas el mouse por encima */
+.boton:hover {
+    transform: scale(1.04);
+    filter: brightness(0.96);
+}
+
+.boton-amarillo { background-color: var(--amarillo); }
+.boton-lila     { background-color: var(--lila); }
+.boton-verde    { background-color: var(--verde); }
+
+.boton-chico {
+    min-width: 0;
+    font-size: 18px;
+    padding: 6px 22px;
+}
+
+.boton-borde {
+    background-color: var(--blanco);
+    border: 2.5px solid var(--borde);
+}
+
+/* Un form NO es un bloque visual, solo envuelve el botón */
+.form-en-linea {
+    display: inline;
+}
+
+.acciones {
+    display: flex;
+    flex-wrap: wrap;              /* si no caben, bajan a la siguiente línea */
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.link-texto {
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+.link-peligro {
+    color: var(--error);
+}
+
+
+/* ---------- 8. PANTALLA DE INICIO ("FIND THE PARTY") ---------- */
+.inicio {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;       /* los hijos uno debajo del otro */
+    align-items: center;          /* centrados horizontalmente */
+    justify-content: center;      /* centrados verticalmente */
+    text-align: center;
+}
+
+.inicio-logo {
+    width: 230px;
+    margin-bottom: 32px;
+}
+
+.boton-inicio {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.firma {
+    margin-top: 72px;
+    font-size: 20px;
+    color: #A8A8A8;
+}
+
+
+/* ---------- 9. LOGIN / REGISTRO ---------- */
+.pie {
+    font-size: 22px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.pie a {
+    text-decoration: none;
+}
+
+
+/* ---------- 10. PERFIL ---------- */
+.perfil-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* La foto redonda (por ahora, tu inicial) */
+.avatar {
+    position: relative;           /* para poder ubicar el lápiz en su esquina */
+    flex-shrink: 0;               /* que nunca se aplaste */
+    width: 122px;
+    height: 122px;
+    border-radius: 50%;           /* 50% = círculo perfecto */
+    background-color: var(--lila);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* El lápiz amarillo, encima del avatar */
+.avatar-lapiz {
+    position: absolute;           /* se ubica respecto al .avatar */
+    top: 4px;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--amarillo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--texto);
+}
+
+.avatar-lapiz .icono {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.5;
+}
+
+.perfil-nombre {
+    font-size: 32px;
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.1;
+    word-break: break-word;       /* si el nombre es larguísimo, se corta y no se sale */
+}
+
+.perfil-descripcion {
+    font-size: 12px;
+    margin: 6px 0 0;
+}
+
+/* La lista de datos: Email, Intereses, Instagram... */
+.datos {
+    margin: 0;
+}
+
+.datos div {
+    display: flex;
+    justify-content: space-between;  /* el nombre a la izquierda y el valor a la derecha */
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #EEE;
+}
+
+.datos div:last-child {
+    border-bottom: none;
+}
+
+.datos dt {
+    color: #777;
+    font-size: 14px;
+}
+
+.datos dd {
+    margin: 0;
+    font-size: 14px;
+    text-align: right;
+    word-break: break-word;
+}
+
+/* El menú con iconos ("Editar perfil", "Privacidad"...) */
+.menu {
+    list-style: none;             /* sin los puntitos de la lista */
+    margin: 0;
+    padding: 8px 20px;
+}
+
+.menu a {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+/* Iconos SVG: por defecto miden lo mismo que el texto */
+.icono {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+}
+
+/* En el menú del perfil: lilas y grandes, como en el Figma */
+.menu-icono {
+    display: flex;
+    color: var(--lila-fuerte);    /* el SVG usa currentColor, así toma este color */
+}
+
+.menu-icono .icono {
+    width: 40px;
+    height: 40px;
+    stroke-width: 1.75;
+}
+
+/* Abajo: botón circular para volver + "Sign Out" */
+.barra-abajo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.boton-volver {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--lila);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--texto);
+}
+
+.boton-volver .icono {
+    width: 40px;
+    height: 40px;
+    stroke-width: 2.25;
+}
+
+/* Las tarjetas de opciones de "My Privacy!" */
+.opcion {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: var(--blanco);
+    border-radius: 11px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+/* En "My Privacy!" los iconos van negros (o del color del texto) */
+.opcion .icono {
+    width: 36px;
+    height: 36px;
+    stroke-width: 1.75;
+}
+
+
+/* ---------- 11. RESPONSIVE: pantallas grandes ----------
+   Todo lo de arriba es para celular. Aquí decimos:
+   "si la pantalla mide 768px o más (tablet/compu), cambia esto". */
+@media (min-width: 768px) {
+    .pantalla {
+        max-width: 520px;
+        padding-top: 56px;
+    }
+
+    /* Más grande en compu */
+    .pantalla-ancha {
+        max-width: 760px;
+    }
+
+    .titulo {
+        font-size: 40px;
+    }
+
+    .logo-arriba {
+        width: 190px;
+    }
+
+    .inicio-logo {
+        width: 300px;
+    }
+
+    /* En compu, el perfil se acomoda en 2 columnas: datos | menú */
+    .perfil-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .perfil-grid .tarjeta {
+        margin-bottom: 0;
+    }
 }

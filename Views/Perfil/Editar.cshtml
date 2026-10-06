@@ -1,44 +1,50 @@
 @model EditarPerfilViewModel
 @{
     ViewData["Title"] = "Configura tu cuenta";
+    ViewData["Fondo"] = "fondo-liso";
 }
 
-<h1>configura tu <em>cuenta</em></h1>
+<img src="~/img/logo-texto.png" alt="Secret Party" class="logo-arriba" />
 
-<form asp-action="Editar" method="post" class="perfil-form">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<h1 class="titulo">configura tu <em>nueva cuenta</em></h1>
 
-    <div class="mb-3">
+<form asp-action="Editar" method="post" class="tarjeta-verde">
+    <div asp-validation-summary="ModelOnly" class="error"></div>
+
+    <div class="campo">
         <label asp-for="NombreUsuario"></label>
-        <input asp-for="NombreUsuario" class="form-control" />
-        <span asp-validation-for="NombreUsuario" class="text-danger"></span>
+        <input asp-for="NombreUsuario" class="input" />
+        <span asp-validation-for="NombreUsuario" class="error"></span>
     </div>
 
-    <div class="mb-3">
+    <div class="campo">
         <label asp-for="Descripcion"></label>
-        <textarea asp-for="Descripcion" class="form-control" rows="3"
-                  placeholder="Cuéntanos de ti..."></textarea>
-        <span asp-validation-for="Descripcion" class="text-danger"></span>
+        <textarea asp-for="Descripcion" class="input" placeholder="Planning events since 2025"></textarea>
+        <span asp-validation-for="Descripcion" class="error"></span>
     </div>
 
-    <div class="mb-3">
+    <div class="campo">
         <label asp-for="FechaNacimiento"></label>
-        <input asp-for="FechaNacimiento" class="form-control" />
-        <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+        <input asp-for="FechaNacimiento" class="input" />
+        <span asp-validation-for="FechaNacimiento" class="error"></span>
     </div>
 
-    <div class="mb-3">
+    <div class="campo">
         <label asp-for="Intereses"></label>
-        <input asp-for="Intereses" class="form-control" placeholder="música, karaoke, playa..." />
+        <input asp-for="Intereses" class="input" placeholder="música, karaoke, playa..." />
     </div>
 
-    <div class="mb-3">
+    <div class="campo">
         <label asp-for="Instagram"></label>
-        <input asp-for="Instagram" class="form-control" placeholder="@@tuusuario" />
+        <input asp-for="Instagram" class="input" placeholder="@@tuusuario" />
     </div>
 
-    <button type="submit" class="btn btn-primary">perfil listo</button>
-    <a asp-action="Index" class="btn btn-link">Cancelar</a>
+    <p class="nota">subir foto de perfil: próximamente</p>
+
+    <div class="acciones">
+        <button type="submit" class="boton boton-lila">perfil listo</button>
+        <a asp-action="Index" class="link-texto">Cancelar</a>
+    </div>
 </form>
 
 @section Scripts {

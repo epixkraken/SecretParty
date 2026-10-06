@@ -1,6 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+@{
+    ViewData["Title"] = "Privacidad";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<h1 class="titulo">My <em>Privacy!</em></h1>
+
+<a asp-controller="Perfil" asp-action="Editar" class="opcion">
+    <partial name="_Icono" model='"usuario"' /> Editar mis datos
+</a>
+
+<a asp-controller="Perfil" asp-action="Eliminar" class="opcion link-peligro">
+    <partial name="_Icono" model='"basura"' /> Eliminar mi cuenta
+</a>
+
+<div class="barra-abajo">
+    <a asp-controller="Perfil" asp-action="Index" class="boton-volver" title="Volver a mi perfil"><partial name="_Icono" model='"volver"' /></a>
+
+    <form asp-controller="Cuenta" asp-action="Logout" method="post" class="form-en-linea">
+        <button type="submit" class="boton boton-verde boton-chico">Sign Out</button>
+    </form>
+</div>

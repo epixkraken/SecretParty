@@ -2,31 +2,74 @@
 
 @{
     ViewData["Title"] = "Mi perfil";
+    ViewData["Ancho"] = "pantalla-ancha";
 }
 
-<h1>Hola <em>@Model.NombreUsuario!</em></h1>
+<h1 class="titulo">Hola <em>@Model.NombreUsuario!</em></h1>
 
-<section class="perfil-tarjeta">
-    <h2>@Model.NombreUsuario</h2>
-    <p>@Model.Descripcion</p>
-
-    <dl>
-        <dt>Email</dt>
-        <dd>@Model.Email</dd>
-
-        <dt>Intereses</dt>
-        <dd>@Model.Intereses</dd>
-
-        <dt>Instagram</dt>
-        <dd>@Model.Instagram</dd>
-
-        <dt>Miembro desde</dt>
-        <dd>@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
-    </dl>
-
-    <a asp-action="Editar" class="btn btn-primary">✏️ Editar perfil</a>
+<!-- Tarjeta principal: foto, nombre y descripción -->
+<section class="tarjeta">
+    <div class="perfil-cabecera">
+        <div class="avatar">
+            @Model.NombreUsuario[0]
+            <a asp-action="Editar" class="avatar-lapiz" title="Editar perfil"><partial name="_Icono" model='"lapiz"' /></a>
+        </div>
+        <div>
+            <h2 class="perfil-nombre">@Model.NombreUsuario</h2>
+            <p class="perfil-descripcion">
+                @(string.IsNullOrWhiteSpace(Model.Descripcion) ? "Todavía no tienes descripción" : Model.Descripcion)
+            </p>
+        </div>
+    </div>
 </section>
 
-<p class="mt-4">
-    <a asp-action="Eliminar" class="text-danger">Eliminar mi cuenta</a>
-</p>
+<!-- En celular van una debajo de otra; en compu, lado a lado -->
+<div class="perfil-grid">
+    <section class="tarjeta">
+        <dl class="datos">
+            <div>
+                <dt>Email</dt>
+                <dd>@Model.Email</dd>
+            </div>
+            <div>
+                <dt>Cumpleaños</dt>
+                <dd>@(Model.FechaNacimiento?.ToString("dd/MM/yyyy") ?? "—")</dd>
+            </div>
+            <div>
+                <dt>Intereses</dt>
+                <dd>@(Model.Intereses ?? "—")</dd>
+            </div>
+            <div>
+                <dt>Instagram</dt>
+                <dd>@(Model.Instagram ?? "—")</dd>
+            </div>
+            <div>
+                <dt>Miembro desde</dt>
+                <dd>@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
+            </div>
+        </dl>
+    </section>
+
+    <nav class="tarjeta">
+        <ul class="menu">
+            <li>
+                <a asp-action="Editar">
+                    <span class="menu-icono"><partial name="_Icono" model='"usuario"' /></span> Editar perfil
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Home" asp-action="Privacy">
+                    <span class="menu-icono"><partial name="_Icono" model='"candado"' /></span> Privacidad
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="barra-abajo">
+    <a asp-controller="Home" asp-action="Index" class="boton-volver" title="Volver al inicio"><partial name="_Icono" model='"volver"' /></a>
+
+    <form asp-controller="Cuenta" asp-action="Logout" method="post" class="form-en-linea">
+        <button type="submit" class="boton boton-verde boton-chico">Sign Out</button>
+    </form>
+</div>

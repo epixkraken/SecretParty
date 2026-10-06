@@ -1,8 +1,15 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Bienvenida";
+    // Si ya iniciaste sesión, el botón te lleva a tu perfil; si no, al login
+    var destino = User.Identity?.IsAuthenticated == true
+        ? Url.Action("Index", "Perfil")
+        : Url.Action("Login", "Cuenta");
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="inicio">
+    <img src="~/img/logo-copa.png" alt="Logo de Secret Party: copa de martini con candado" class="inicio-logo" />
+
+    <a href="@destino" class="boton boton-lila boton-inicio">FIND THE PARTY</a>
+
+    <p class="firma">by: bff4.com</p>
+</section>
