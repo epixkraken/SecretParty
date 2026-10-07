@@ -542,3 +542,21 @@ button:hover,
 input[type="submit"]:hover {
   transform: scale(1.05);
 }
+
+html {
+  scrollbar-color: #b98cff #f5eeff; /* Firefox */
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5eeff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #b98cff;
+  border-radius: 999px;
+  border: 2px solid #d4ff3f;
+}
