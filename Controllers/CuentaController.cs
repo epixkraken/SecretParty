@@ -27,6 +27,11 @@ namespace SecretParty.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Registro(RegistroViewModel model)
         {
+            // VALIDACIÓN EN EL BACK-END del dato sensible: solo mayores de 18
+            var errorEdad = Edad.Validar(model.FechaNacimiento);
+            if (errorEdad != null)
+                ModelState.AddModelError(nameof(model.FechaNacimiento), errorEdad);
+
             if (!ModelState.IsValid) return View(model);
 
             if (await _db.Usuarios.AnyAsync(u => u.Email == model.Email))
@@ -43,7 +48,8 @@ namespace SecretParty.Controllers
             var usuario = new Usuario
             {
                 NombreUsuario = model.NombreUsuario,
-                Email = model.Email
+                Email = model.Email,
+                FechaNacimiento = model.FechaNacimiento
             };
             // esta es la encriptacion de la clave del usuario 
             usuario.PasswordHash = _hasher.HashPassword(usuario, model.Password);

@@ -64,6 +64,11 @@ namespace SecretParty.Controllers
             var usuario = await ObtenerUsuarioActual();
             if (usuario == null) return RedirectToAction("Login", "Cuenta");
 
+            // VALIDACIÓN EN EL BACK-END: nadie puede cambiarse la fecha para quedar menor de 18
+            var errorEdad = Edad.Validar(model.FechaNacimiento);
+            if (errorEdad != null)
+                ModelState.AddModelError(nameof(model.FechaNacimiento), errorEdad);
+
             if (!ModelState.IsValid) return View(model);
 
             // El nombre no puede estar ocupado por OTRA persona

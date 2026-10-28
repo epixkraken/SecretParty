@@ -17,8 +17,10 @@
         {
             var u = f.Usuario;
             var enRiesgo = f.Reportes >= AdminController.LimiteReportes;
+            int? edad = u.FechaNacimiento == null ? null : Edad.Calcular(u.FechaNacimiento.Value);
+            var esMenor = edad < Edad.Minima;
 
-            <li class="@(enRiesgo ? "fila-riesgo" : "")">
+            <li class="@(enRiesgo || esMenor ? "fila-riesgo" : "")">
                 <div class="avatar avatar-chico">@u.NombreUsuario[0]</div>
                 <div class="fila-datos">
                     <strong>@u.NombreUsuario</strong>
@@ -32,12 +34,24 @@
                             @f.Reportes @(f.Reportes == 1 ? "flag" : "flags")
                         </span>
                     }
-                    <div class="nota">@u.Email · desde @u.FechaRegistro.ToString("dd/MM/yyyy")</div>
+                    @* Datos que entraron antes de la validación de edad *@
+                    @if (esMenor)
+                    {
+                        <span class="etiqueta etiqueta-roja">menor de edad</span>
+                    }
+                    else if (edad == null && !u.EsAdmin)
+                    {
+                        <span class="etiqueta etiqueta-amarilla">sin fecha</span>
+                    }
+                    <div class="nota">
+                        @u.Email · @(edad == null ? "" : $"{edad} años · ")desde @u.FechaRegistro.ToString("dd/MM/yyyy")
+                    </div>
                 </div>
 
                 @if (!u.EsAdmin)
                 {
                     <div class="fila-acciones">
+                        <a asp-action="EditarUsuario" asp-route-id="@u.Id" title="Editar" class="boton-icono"><partial name="_Icono" model='"lapiz"' /></a>
                         <a asp-action="NuevoReporte" asp-route-usuarioId="@u.Id" title="Flaguear" class="boton-icono"><partial name="_Icono" model='"bandera"' /></a>
                         <a asp-action="EliminarUsuario" asp-route-id="@u.Id" title="Eliminar" class="boton-icono link-peligro"><partial name="_Icono" model='"basura"' /></a>
                     </div>

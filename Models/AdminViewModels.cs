@@ -19,6 +19,27 @@ namespace SecretParty.Models
         public int Reportes { get; set; }
     }
 
+    // Lo que el admin puede corregir de un usuario.
+    // No incluye PasswordHash ni EsAdmin: eso nunca se toca desde un formulario.
+    public class EditarUsuarioAdminViewModel
+    {
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "El nombre de usuario es obligatorio")]
+        [StringLength(30)]
+        [Display(Name = "Nombre de usuario")]
+        public string NombreUsuario { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El email es obligatorio")]
+        [EmailAddress(ErrorMessage = "Email no válido")]
+        public string Email { get; set; } = string.Empty;
+
+        // Sin [Required]: la edad la valida el servidor (ver Edad.cs)
+        [DataType(DataType.Date)]
+        [Display(Name = "Fecha de nacimiento")]
+        public DateTime? FechaNacimiento { get; set; }
+    }
+
     // El formulario de "flaguear un perfil".
     // Solo viajan IDs: el usuario los ESCOGE de dropdowns, nunca los escribe.
     public class NuevoReporteViewModel

@@ -28,6 +28,11 @@ namespace SecretParty.Models
         [EmailAddress(ErrorMessage = "Email no válido")]
         public string Email { get; set; } = string.Empty;
 
+        // Sin [Required] a propósito: TODA la validación de la edad la hace el servidor (ver Edad.cs)
+        [DataType(DataType.Date)]
+        [Display(Name = "Fecha de nacimiento")]
+        public DateTime? FechaNacimiento { get; set; }
+
         [Required(ErrorMessage = "La contraseña es obligatoria")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Mínimo 6 caracteres")]
         [DataType(DataType.Password)]

@@ -24,6 +24,12 @@
     </div>
 
     <div class="campo">
+        <label asp-for="FechaNacimiento"></label>
+        <input asp-for="FechaNacimiento" class="input" />
+        <span asp-validation-for="FechaNacimiento" class="error"></span>
+    </div>
+
+    <div class="campo">
         <label asp-for="Password"></label>
         <input asp-for="Password" class="input" placeholder="mínimo 6 caracteres" />
         <span asp-validation-for="Password" class="error"></span>

@@ -1,0 +1,43 @@
+@model EditarUsuarioAdminViewModel
+@{
+    ViewData["Title"] = "Editar usuario";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">Editar a <em>@Model.NombreUsuario</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<form asp-action="EditarUsuario" method="post" class="tarjeta-verde">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="error"></div>
+
+    <div class="campo">
+        <label asp-for="NombreUsuario"></label>
+        <input asp-for="NombreUsuario" class="input" />
+        <span asp-validation-for="NombreUsuario" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="input" />
+        <span asp-validation-for="Email" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="FechaNacimiento"></label>
+        <input asp-for="FechaNacimiento" class="input" />
+        <span asp-validation-for="FechaNacimiento" class="error"></span>
+    </div>
+
+    <p class="nota">Solo mayores de @Edad.Minima años: esto lo revisa el servidor antes de guardar.</p>
+
+    <div class="acciones">
+        <button type="submit" class="boton boton-lila">guardar cambios</button>
+        <a asp-action="Usuarios" class="link-texto">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
