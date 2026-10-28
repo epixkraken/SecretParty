@@ -45,14 +45,14 @@ namespace SecretParty.Controllers
                 NombreUsuario = model.NombreUsuario,
                 Email = model.Email
             };
-            // Encriptamos la contraseña antes de guardarla
+            // esta es la encriptacion de la clave del usuario 
             usuario.PasswordHash = _hasher.HashPassword(usuario, model.Password);
 
             _db.Usuarios.Add(usuario);
             await _db.SaveChangesAsync();
 
             await IniciarSesion(usuario);
-            // Recién registrado -> "configura tu nueva cuenta"
+            // recien se registro y le lleva a crear su nueva cuenta 
             return RedirectToAction("Editar", "Perfil");
         }
 
@@ -81,9 +81,13 @@ namespace SecretParty.Controllers
 
             await IniciarSesion(usuario);
 
-            // Si venías de una página protegida, te regresa ahí
+            // este es el que redirige 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                 return Redirect(model.ReturnUrl);
+
+            // El admin va a su dashboard; los demás, a su perfil
+            if (usuario.EsAdmin)
+                return RedirectToAction("Index", "Admin");
 
             return RedirectToAction("Index", "Perfil");
         }
@@ -97,7 +101,12 @@ namespace SecretParty.Controllers
             return RedirectToAction("Login");
         }
 
-        // Crea la "credencial" (cookie) del usuario logueado
+        // ---------- ACCESO DENEGADO ----------
+        // Tiene sesión pero no el rol necesario (ej: un usuario normal entrando a /Admin)
+        [HttpGet]
+        public IActionResult AccesoDenegado() => View();
+
+        // hace la "credencial" (cookie) del usuario logueado
         private async Task IniciarSesion(Usuario usuario)
         {
             var claims = new List<Claim>
@@ -106,6 +115,9 @@ namespace SecretParty.Controllers
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
                 new Claim(ClaimTypes.Email, usuario.Email)
             };
+            // Si es admin, la credencial lleva el rol "Admin"
+            if (usuario.EsAdmin)
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
             var identidad = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(

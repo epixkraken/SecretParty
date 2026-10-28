@@ -1,0 +1,20 @@
+@* Menú de pestañas del admin. La pestaña activa se marca según la acción actual. *@
+@{
+    var accion = ViewContext.RouteData.Values["action"]?.ToString();
+    string Activa(string nombre) => accion == nombre ? "activa" : "";
+}
+
+<nav class="menu-admin">
+    <a asp-action="Index" class="@Activa("Index")">Dashboard</a>
+    <a asp-action="Usuarios" class="@Activa("Usuarios")">Usuarios</a>
+    <a asp-action="NuevoReporte" class="@Activa("NuevoReporte")">Flaguear perfil</a>
+    <a asp-action="MiCuenta" class="@Activa("MiCuenta")">Mi cuenta</a>
+    <form asp-controller="Cuenta" asp-action="Logout" method="post" class="form-en-linea">
+        <button type="submit" class="boton boton-verde boton-chico">Sign Out</button>
+    </form>
+</nav>
+
+@if (TempData["Mensaje"] != null)
+{
+    <p class="aviso">@TempData["Mensaje"]</p>
+}

@@ -1,8 +1,8 @@
 @{
     ViewData["Title"] = "Bienvenida";
-    // Si ya iniciaste sesión, el botón te lleva a tu perfil; si no, al login
-    var destino = User.Identity?.IsAuthenticated == true
-        ? Url.Action("Index", "Perfil")
+    // Admin -> su panel; usuario con sesión -> su perfil; sin sesión -> al login
+    var destino = User.IsInRole("Admin") ? Url.Action("Index", "Admin")
+        : User.Identity?.IsAuthenticated == true ? Url.Action("Index", "Perfil")
         : Url.Action("Login", "Cuenta");
 }
 

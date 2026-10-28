@@ -1,0 +1,80 @@
+@model PanelAdminViewModel
+
+@{
+    ViewData["Title"] = "Panel admin";
+    ViewData["Ancho"] = "pantalla-ancha";
+
+    // MOCK UP: todavía no existe la tabla de eventos, estos datos son de ejemplo
+    var eventosMock = new[]
+    {
+        (Nombre: "Karaoke night", Lugar: "Quito · La Floresta", Fecha: "01/11", Asistentes: 24),
+        (Nombre: "Sunset en la playa", Lugar: "Montañita", Fecha: "02/11", Asistentes: 58),
+        (Nombre: "Halloween secret party", Lugar: "Quito · Cumbayá", Fecha: "31/10", Asistentes: 112),
+    };
+}
+
+<h1 class="titulo">Panel <em>admin</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<!-- Números reales, salen de la base de datos -->
+<div class="stats">
+    <div class="stat">
+        <span class="stat-numero">@Model.TotalUsuarios</span>
+        <span class="stat-texto">usuarios en la app</span>
+    </div>
+    <div class="stat">
+        <span class="stat-numero">@Model.NuevosEstaSemana</span>
+        <span class="stat-texto">nuevos esta semana</span>
+    </div>
+    <div class="stat">
+        <span class="stat-numero">@Model.TotalReportes</span>
+        <span class="stat-texto">reportes recibidos</span>
+    </div>
+    <a asp-action="Usuarios" class="stat @(Model.UsuariosEnRiesgo > 0 ? "stat-alerta" : "")">
+        <span class="stat-numero">@Model.UsuariosEnRiesgo</span>
+        <span class="stat-texto">perfiles con @AdminController.LimiteReportes+ flags</span>
+    </a>
+</div>
+
+<div class="perfil-grid">
+    <section class="tarjeta">
+        <h2 class="subtitulo">Eventos subidos <span class="etiqueta etiqueta-amarilla">mock up</span></h2>
+        <ul class="lista-admin">
+            @foreach (var e in eventosMock)
+            {
+                <li>
+                    <div class="fecha-evento">@e.Fecha</div>
+                    <div>
+                        <strong>@e.Nombre</strong>
+                        <div class="nota">@e.Lugar · @e.Asistentes van</div>
+                    </div>
+                </li>
+            }
+        </ul>
+        <p class="nota">Próximamente: los eventos que suban los usuarios.</p>
+    </section>
+
+    <section class="tarjeta">
+        <h2 class="subtitulo">Últimos reportes</h2>
+        @if (Model.UltimosReportes.Count == 0)
+        {
+            <p class="nota">Todavía no hay reportes.</p>
+        }
+        else
+        {
+            <ul class="lista-admin">
+                @foreach (var r in Model.UltimosReportes)
+                {
+                    <li>
+                        <div class="avatar avatar-chico">@r.UsuarioReportado!.NombreUsuario[0]</div>
+                        <div>
+                            <strong>@r.UsuarioReportado.NombreUsuario</strong>
+                            <div class="nota">@r.Motivo!.Categoria!.Nombre · @r.Motivo.Nombre</div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+</div>

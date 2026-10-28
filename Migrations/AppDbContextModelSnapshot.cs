@@ -17,6 +17,144 @@ namespace SecretParty.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
+            modelBuilder.Entity("SecretParty.Models.CategoriaReporte", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CategoriasReporte");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Nombre = "Perfil falso"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Nombre = "Comportamiento"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Nombre = "Contenido inapropiado"
+                        });
+                });
+
+            modelBuilder.Entity("SecretParty.Models.MotivoReporte", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoriaReporteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoriaReporteId");
+
+                    b.ToTable("MotivosReporte");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CategoriaReporteId = 1,
+                            Nombre = "Fotos robadas"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CategoriaReporteId = 1,
+                            Nombre = "Se hace pasar por otra persona"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CategoriaReporteId = 1,
+                            Nombre = "Parece menor de edad"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CategoriaReporteId = 2,
+                            Nombre = "Acoso"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CategoriaReporteId = 2,
+                            Nombre = "Lenguaje ofensivo"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CategoriaReporteId = 2,
+                            Nombre = "No se presentó al evento"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CategoriaReporteId = 3,
+                            Nombre = "Fotos explícitas"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CategoriaReporteId = 3,
+                            Nombre = "Spam o publicidad"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CategoriaReporteId = 3,
+                            Nombre = "Venta de sustancias"
+                        });
+                });
+
+            modelBuilder.Entity("SecretParty.Models.Reporte", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Comentario")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MotivoReporteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UsuarioReportadoId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MotivoReporteId");
+
+                    b.HasIndex("UsuarioReportadoId");
+
+                    b.ToTable("Reportes");
+                });
+
             modelBuilder.Entity("SecretParty.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")
@@ -30,6 +168,9 @@ namespace SecretParty.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("EsAdmin")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("FechaNacimiento")
                         .HasColumnType("TEXT");
@@ -64,6 +205,41 @@ namespace SecretParty.Migrations
                         .IsUnique();
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("SecretParty.Models.MotivoReporte", b =>
+                {
+                    b.HasOne("SecretParty.Models.CategoriaReporte", "Categoria")
+                        .WithMany("Motivos")
+                        .HasForeignKey("CategoriaReporteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Categoria");
+                });
+
+            modelBuilder.Entity("SecretParty.Models.Reporte", b =>
+                {
+                    b.HasOne("SecretParty.Models.MotivoReporte", "Motivo")
+                        .WithMany()
+                        .HasForeignKey("MotivoReporteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SecretParty.Models.Usuario", "UsuarioReportado")
+                        .WithMany()
+                        .HasForeignKey("UsuarioReportadoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Motivo");
+
+                    b.Navigation("UsuarioReportado");
+                });
+
+            modelBuilder.Entity("SecretParty.Models.CategoriaReporte", b =>
+                {
+                    b.Navigation("Motivos");
                 });
 #pragma warning restore 612, 618
         }

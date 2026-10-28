@@ -1,0 +1,50 @@
+@model Usuario
+@{
+    ViewData["Title"] = "Mi cuenta";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">Mi <em>cuenta</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<section class="tarjeta">
+    <div class="perfil-cabecera">
+        <div class="avatar avatar-admin">
+            <partial name="_Icono" model='"escudo"' />
+        </div>
+        <div>
+            <h2 class="perfil-nombre">@Model.NombreUsuario <span class="etiqueta">Admin</span></h2>
+            <p class="perfil-descripcion">Administrador de Secret Party</p>
+        </div>
+    </div>
+</section>
+
+<div class="perfil-grid">
+    <section class="tarjeta">
+        <dl class="datos">
+            <div>
+                <dt>Email</dt>
+                <dd>@Model.Email</dd>
+            </div>
+            <div>
+                <dt>Rol</dt>
+                <dd>Administrador</dd>
+            </div>
+            <div>
+                <dt>Cuenta creada</dt>
+                <dd>@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="tarjeta">
+        <h2 class="subtitulo">Qué puedes hacer</h2>
+        <ul class="lista-reportes">
+            <li>Ver cuánta gente usa la app</li>
+            <li>Flaguear perfiles que rompen las reglas</li>
+            <li>Eliminar perfiles con muchos flags</li>
+            <li>Revisar los eventos que se suben <span class="etiqueta etiqueta-amarilla">próximamente</span></li>
+        </ul>
+    </section>
+</div>

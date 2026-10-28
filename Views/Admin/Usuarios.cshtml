@@ -1,0 +1,48 @@
+@model List<UsuarioAdminFila>
+
+@{
+    ViewData["Title"] = "Usuarios";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">Todos los <em>usuarios</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<section class="tarjeta">
+    <p>Usuarios registrados: <strong>@Model.Count</strong></p>
+
+    <ul class="lista-admin">
+        @foreach (var f in Model)
+        {
+            var u = f.Usuario;
+            var enRiesgo = f.Reportes >= AdminController.LimiteReportes;
+
+            <li class="@(enRiesgo ? "fila-riesgo" : "")">
+                <div class="avatar avatar-chico">@u.NombreUsuario[0]</div>
+                <div class="fila-datos">
+                    <strong>@u.NombreUsuario</strong>
+                    @if (u.EsAdmin)
+                    {
+                        <span class="etiqueta">Admin</span>
+                    }
+                    @if (f.Reportes > 0)
+                    {
+                        <span class="etiqueta @(enRiesgo ? "etiqueta-roja" : "etiqueta-amarilla")">
+                            @f.Reportes @(f.Reportes == 1 ? "flag" : "flags")
+                        </span>
+                    }
+                    <div class="nota">@u.Email · desde @u.FechaRegistro.ToString("dd/MM/yyyy")</div>
+                </div>
+
+                @if (!u.EsAdmin)
+                {
+                    <div class="fila-acciones">
+                        <a asp-action="NuevoReporte" asp-route-usuarioId="@u.Id" title="Flaguear" class="boton-icono"><partial name="_Icono" model='"bandera"' /></a>
+                        <a asp-action="EliminarUsuario" asp-route-id="@u.Id" title="Eliminar" class="boton-icono link-peligro"><partial name="_Icono" model='"basura"' /></a>
+                    </div>
+                }
+            </li>
+        }
+    </ul>
+</section>

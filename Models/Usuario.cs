@@ -35,5 +35,8 @@ namespace SecretParty.Models
         public string? FotoPerfil { get; set; }
 
         public DateTime FechaRegistro { get; set; } = DateTime.Now;
+
+        // true = puede entrar al panel de administración
+        public bool EsAdmin { get; set; }
     }
 }

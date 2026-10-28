@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using SecretParty.Data;
 using SecretParty.Models;
 
 namespace SecretParty.Controllers
 {
-    [Authorize] // Todo este controlador exige haber iniciado sesión
+    [Authorize] //  este controlador exige haber iniciado sesión
     public class PerfilController : Controller
     {
         private readonly AppDbContext _db;
@@ -17,6 +18,14 @@ namespace SecretParty.Controllers
         public PerfilController(AppDbContext db)
         {
             _db = db;
+        }
+
+        // Se ejecuta ANTES de cualquier acción de este controlador.
+        // El admin no tiene perfil social: si intenta entrar aquí, lo mandamos a su panel.
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (User.IsInRole("Admin"))
+                context.Result = RedirectToAction("Index", "Admin");
         }
 
         // ---------- VER MI PERFIL (Read) ----------
@@ -119,6 +128,9 @@ namespace SecretParty.Controllers
                 new Claim(ClaimTypes.Name, usuario.NombreUsuario),
                 new Claim(ClaimTypes.Email, usuario.Email)
             };
+            // Sin esto, al editar el perfil el admin perdería su rol
+            if (usuario.EsAdmin)
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
             var identidad = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(

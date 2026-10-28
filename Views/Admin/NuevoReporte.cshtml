@@ -1,0 +1,74 @@
+@model NuevoReporteViewModel
+@{
+    ViewData["Title"] = "Flaguear perfil";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">Flaguear un <em>perfil</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<form asp-action="NuevoReporte" method="post" class="tarjeta-verde">
+    <div asp-validation-summary="ModelOnly" class="error"></div>
+
+    <!-- Dropdown 1: el perfil. Nunca se escribe el ID a mano. -->
+    <div class="campo">
+        <label asp-for="UsuarioReportadoId"></label>
+        <select asp-for="UsuarioReportadoId" asp-items="ViewBag.Usuarios" class="input">
+            <option value="0">-- Escoge un perfil --</option>
+        </select>
+        <span asp-validation-for="UsuarioReportadoId" class="error"></span>
+    </div>
+
+    <!-- Dropdown 2: la categoría (tabla padre) -->
+    <div class="campo">
+        <label asp-for="CategoriaId"></label>
+        <select asp-for="CategoriaId" asp-items="ViewBag.Categorias" class="input">
+            <option value="0">-- Escoge una categoría --</option>
+        </select>
+        <span asp-validation-for="CategoriaId" class="error"></span>
+    </div>
+
+    <!-- Dropdown 3: el motivo (tabla hija). Se llena según la categoría. -->
+    <div class="campo">
+        <label asp-for="MotivoId"></label>
+        <select asp-for="MotivoId" asp-items="ViewBag.Motivos" class="input">
+            <option value="0">-- Primero escoge una categoría --</option>
+        </select>
+        <span asp-validation-for="MotivoId" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Comentario"></label>
+        <textarea asp-for="Comentario" class="input" placeholder="Qué pasó..."></textarea>
+        <span asp-validation-for="Comentario" class="error"></span>
+    </div>
+
+    <div class="acciones">
+        <button type="submit" class="boton boton-lila">guardar reporte</button>
+        <a asp-action="Usuarios" class="link-texto">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // DROPDOWN EN CASCADA:
+        // cuando cambia la categoría, le pedimos al servidor sus motivos
+        // y reemplazamos las opciones del dropdown de motivos.
+        const categoria = document.getElementById("CategoriaId");
+        const motivo = document.getElementById("MotivoId");
+
+        categoria.addEventListener("change", async () => {
+            motivo.innerHTML = '<option value="0">-- Escoge un motivo --</option>';
+            if (categoria.value === "0") return;
+
+            const respuesta = await fetch(`@Url.Action("MotivosPorCategoria")?categoriaId=${categoria.value}`);
+            const motivos = await respuesta.json();
+
+            for (const m of motivos) {
+                motivo.add(new Option(m.nombre, m.id));
+            }
+        });
+    </script>
+}

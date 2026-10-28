@@ -486,6 +486,203 @@ textarea.input {
 }
 
 
+/* ---------- 10b. PANEL ADMIN ---------- */
+
+/* Lista de usuarios: una fila por persona */
+.lista-admin {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+}
+
+.lista-admin li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--lila);
+}
+
+/* El avatar del admin lleva un escudo en vez de la inicial */
+.avatar-admin {
+    background-color: var(--verde);
+}
+
+.avatar-admin .icono {
+    width: 56px;
+    height: 56px;
+    stroke-width: 1.75;
+}
+
+/* El mismo círculo del perfil, pero chiquito */
+.avatar-chico {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+}
+
+/* Pastilla verde que dice "Admin" */
+.etiqueta {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 10px;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    background-color: var(--verde);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.etiqueta-amarilla { background-color: var(--amarillo); }
+.etiqueta-roja     { background-color: var(--error); color: var(--blanco); }
+
+/* Pestañas de arriba: Dashboard | Usuarios | ... */
+.menu-admin {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.menu-admin a {
+    padding: 6px 16px;
+    border-radius: 45px;
+    background-color: var(--blanco);
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.menu-admin a.activa {
+    background-color: var(--lila);
+    font-weight: 600;
+}
+
+/* El Sign Out se va a la derecha */
+.menu-admin .form-en-linea {
+    margin-left: auto;
+}
+
+/* Mensaje de "Reporte guardado", "Se eliminó a..." */
+.aviso {
+    background-color: var(--amarillo);
+    border-radius: 11px;
+    padding: 12px 20px;
+    margin: 0 0 20px;
+}
+
+/* Los cuadritos con números del dashboard: 2 columnas en celular */
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--blanco);
+    border-radius: 11px;
+    padding: 16px 20px;
+    text-decoration: none;
+}
+
+.stat-numero {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--lila-fuerte);
+    line-height: 1.1;
+}
+
+.stat-texto {
+    font-size: 14px;
+}
+
+/* Si hay perfiles con muchos flags, ese cuadrito se pinta de alerta */
+.stat-alerta {
+    border: 2.5px solid var(--error);
+}
+
+.stat-alerta .stat-numero {
+    color: var(--error);
+}
+
+.subtitulo {
+    font-size: 20px;
+    margin: 0 0 4px;
+}
+
+/* El cuadrito con la fecha del evento */
+.fecha-evento {
+    flex-shrink: 0;
+    width: 52px;
+    padding: 8px 0;
+    border-radius: 11px;
+    background-color: var(--verde);
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* En la lista de usuarios, los datos ocupan todo el espacio y los botones van a la derecha */
+.fila-datos {
+    flex: 1;
+    min-width: 0;                 /* deja que un email largo se corte en vez de empujar todo */
+    overflow-wrap: anywhere;
+}
+
+.fila-acciones {
+    display: flex;
+    gap: 6px;
+}
+
+/* Perfil con muchos flags: fondo rojito */
+.fila-riesgo {
+    background-color: rgba(211, 63, 73, 0.08);
+    border-radius: 11px;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+/* Botoncito redondo solo con icono (bandera, basura) */
+.boton-icono {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--lila);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--texto);
+}
+
+.boton-icono.link-peligro {
+    background-color: var(--blanco);
+    border: 2px solid var(--error);
+    color: var(--error);
+}
+
+.boton-icono .icono {
+    width: 20px;
+    height: 20px;
+}
+
+.lista-reportes {
+    padding-left: 20px;
+}
+
+.lista-reportes li {
+    margin-bottom: 8px;
+}
+
+/* Los dropdowns usan la clase .input; aquí solo les dejamos espacio para la flechita */
+select.input {
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+
 /* ---------- 11. RESPONSIVE: pantallas grandes ----------
    Todo lo de arriba es para celular. Aquí decimos:
    "si la pantalla mide 768px o más (tablet/compu), cambia esto". */
@@ -521,5 +718,10 @@ textarea.input {
 
     .perfil-grid .tarjeta {
         margin-bottom: 0;
+    }
+
+    /* En compu, los 4 números del dashboard van en una sola fila */
+    .stats {
+        grid-template-columns: repeat(4, 1fr);
     }
 }

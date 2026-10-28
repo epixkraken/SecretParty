@@ -1,0 +1,41 @@
+@model Usuario
+@{
+    ViewData["Title"] = "Eliminar usuario";
+    var reportes = (List<Reporte>)ViewBag.Reportes;
+}
+
+<h1 class="titulo">¿Eliminar a <em>@Model.NombreUsuario?</em></h1>
+
+<section class="tarjeta">
+    <p>Vas a eliminar la cuenta <strong>@Model.NombreUsuario</strong> (@Model.Email).</p>
+
+    @if (reportes.Count > 0)
+    {
+        <p>Tiene <strong>@reportes.Count</strong> @(reportes.Count == 1 ? "reporte" : "reportes"):</p>
+        <ul class="lista-reportes">
+            @foreach (var r in reportes)
+            {
+                <li>
+                    <strong>@r.Motivo!.Categoria!.Nombre</strong> · @r.Motivo.Nombre
+                    @if (!string.IsNullOrWhiteSpace(r.Comentario))
+                    {
+                        <div class="nota">"@r.Comentario"</div>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No tiene reportes.</p>
+    }
+
+    <p>Esto <strong>no se puede deshacer</strong>.</p>
+
+    <div class="acciones">
+        <form asp-action="EliminarUsuario" asp-route-id="@Model.Id" method="post" class="form-en-linea">
+            <button type="submit" class="boton boton-borde boton-chico link-peligro">Sí, eliminar</button>
+        </form>
+        <a asp-action="Usuarios" class="boton boton-lila boton-chico">No, regresar</a>
+    </div>
+</section>
