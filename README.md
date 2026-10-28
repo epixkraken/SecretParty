@@ -23,6 +23,7 @@
 - [Sobre el proyecto](#-sobre-el-proyecto)
 - [Capturas de pantalla](#-capturas-de-pantalla)
 - [Funcionalidades](#-funcionalidades)
+- [Panel de administración](#-panel-de-administración)
 - [Requisitos de la tarea](#-requisitos-de-la-tarea)
 - [Tecnologías](#-tecnologías)
 - [Cómo ejecutarlo](#-cómo-ejecutarlo)
@@ -37,11 +38,17 @@
 
 ## 💜 Sobre el proyecto
 
-**Secret Party** es una app web donde cada persona tiene su perfil para encontrar fiestas y planes. Esta primera entrega se enfoca en la base de cualquier red social:
+**Secret Party** es una app web donde cada persona tiene su perfil para encontrar fiestas y planes. Es **solo para mayores de 18 años**.
 
+**Entrega 1: la base de cualquier red social**
 - **Registro e inicio de sesión** con email y contraseña.
 - **Un perfil propio** que cada usuario puede ver, editar y eliminar.
 - **Páginas privadas** a las que no se puede entrar sin iniciar sesión.
+
+**Entrega 2: la administración que alimenta la app**
+- Un **panel de administración** al que solo entra el rol **Admin**.
+- **Moderación**: el admin puede flaguear perfiles que rompen las reglas y eliminar a los que acumulan muchos flags, como en Tinder.
+- **Validación de edad 18+ en el back-end**, el dato sensible de la app.
 
 El diseño viene de un prototipo propio en **Figma**: colores lila y verde lima, botones tipo pastilla, la letra Poppins y un fondo con notas musicales, lunas y estrellas. Es **mobile first** y se adapta a pantallas de computadora (responsive).
 
@@ -61,17 +68,64 @@ El diseño viene de un prototipo propio en **Figma**: colores lila y verde lima,
 
 <img src="docs/capturas/perfil-compu.png" alt="Perfil en computadora" width="720">
 
+### Panel de administración
+
+| Dashboard | Usuarios |
+|:---:|:---:|
+| <img src="docs/capturas/admin-dashboard.png" width="360" alt="Dashboard del admin"> | <img src="docs/capturas/admin-usuarios.png" width="360" alt="Lista de usuarios con flags"> |
+
+| Flaguear perfil (dropdowns en cascada) | Validación de edad en el back-end |
+|:---:|:---:|
+| <img src="docs/capturas/admin-flaguear.png" width="360" alt="Formulario de reporte"> | <img src="docs/capturas/admin-edad.png" width="360" alt="Error de menor de edad"> |
+
 ---
 
 ## ✨ Funcionalidades
 
-- **Crear cuenta** con nombre de usuario, email y contraseña. Valida que el email y el nombre no estén ocupados.
+- **Crear cuenta** con nombre de usuario, email, fecha de nacimiento y contraseña. Valida que el email y el nombre no estén ocupados y que la persona sea **mayor de 18**.
 - **Iniciar y cerrar sesión** con cookies. La sesión dura 2 horas.
 - **Configurar el perfil**: descripción, fecha de nacimiento, intereses e Instagram.
 - **Ver mi perfil** ("Hola Chloe!") con todos mis datos.
 - **Eliminar mi cuenta**, con una pantalla de confirmación antes de borrar.
 - **Páginas protegidas**: si no has iniciado sesión, te manda al login, y después de entrar te regresa a la página que querías ver.
 - **Diseño responsive**: una columna en celular y dos columnas en computadora.
+
+---
+
+## 👑 Panel de administración
+
+El admin **no tiene perfil social**: al iniciar sesión entra directo a su panel y, si intenta abrir `/Perfil`, la app lo regresa al panel.
+
+| Sección | Qué hace |
+|---|---|
+| **Dashboard** | Números reales sacados de la base: usuarios en la app, nuevos esta semana, reportes recibidos y perfiles con 3 o más flags. También muestra los últimos reportes. La lista de *eventos subidos* por ahora es un **mock up**. |
+| **Usuarios** | Lista de todos los usuarios con su **edad** y su número de **flags**. Los que tienen 3 o más flags, o que son menores de edad, salen marcados en rojo. Desde aquí se puede **editar**, **flaguear** o **eliminar** a cada uno. |
+| **Editar usuario** | El admin puede corregir nombre, email y fecha de nacimiento. Pasa por la misma **validación de 18+** en el servidor. |
+| **Eliminar usuario** | Antes de borrar muestra todos los reportes de esa persona, para decidir con información. Sus reportes se borran con ella (borrado en cascada). |
+| **Flaguear perfil** | Formulario con **3 dropdowns**: perfil → **categoría** → **motivo**. Al escoger la categoría se cargan solo sus motivos. |
+| **Mi cuenta** | Los datos del admin, sin salir del panel. |
+
+### Modelo de datos
+
+```
+CategoriaReporte 1 ──── * MotivoReporte 1 ──── * Reporte * ──── 1 Usuario
+ (Perfil falso,           (Fotos robadas,         (el flag)         (el perfil
+  Comportamiento, ...)     Acoso, ...)                               reportado)
+```
+
+Las categorías y los motivos se cargan solos con la migración (`HasData` en `AppDbContext`).
+
+### Cómo ser admin
+
+En `appsettings.json` va el email de la cuenta que será admin:
+
+```json
+"Admin": {
+  "Email": "secret@party.com"
+}
+```
+
+Al arrancar, la app busca esa cuenta y le pone `EsAdmin = true`. Primero hay que **registrar** la cuenta con ese email y luego reiniciar la app. Así no se guarda ninguna contraseña en el código.
 
 ---
 
@@ -85,6 +139,16 @@ El diseño viene de un prototipo propio en **Figma**: colores lila y verde lima,
 | El usuario accede a una **sección protegida** (CRUD) | `PerfilController` tiene `[Authorize]` en toda la clase |
 | Las **URLs protegidas** no son accesibles sin autenticación | Abrir `/Perfil` sin sesión → redirige a `/Cuenta/Login?ReturnUrl=%2FPerfil` |
 
+### Entrega 2: Administración MVC
+
+| Requisito | Cómo se cumple |
+|---|---|
+| Administración **MVC** que alimenta el core | `AdminController` + `Views/Admin/`: dashboard, usuarios y reportes |
+| Validación en el **back-end** de un **dato sensible** | La **edad (18+)**. La regla está en [`Models/Edad.cs`](Models/Edad.cs) y se revisa en el **controlador**, antes de `SaveChanges()`, en `Cuenta/Registro`, `Perfil/Editar` y `Admin/EditarUsuario`. **No hay JavaScript** validando la edad: aunque alguien envíe el formulario a mano, el servidor lo rechaza. |
+| Las **claves foráneas** se eligen con **dropdown**, no con un input | En *Flaguear perfil* el perfil, la categoría y el motivo son `<select>`. El de motivos está **en cascada**: al cambiar la categoría, JavaScript llama a `/Admin/MotivosPorCategoria?categoriaId=…` y lo rellena solo con los motivos de esa categoría. El servidor además comprueba que el motivo **sí pertenezca** a la categoría. |
+| Código versionado en **Git** con README | Este repositorio |
+| **Deploy** en un servidor (no localhost) | ⏳ Pendiente |
+
 ---
 
 ## 🛠 Tecnologías
@@ -95,7 +159,9 @@ El diseño viene de un prototipo propio en **Figma**: colores lila y verde lima,
 - **`PasswordHasher`** de ASP.NET Core Identity para encriptar contraseñas
 - **Razor** + **Tag Helpers** para las vistas
 - **CSS propio** (sin Bootstrap): variables, flexbox, grid y media queries
-- **jQuery Validation** para validar los formularios en el navegador
+- **Roles** en la cookie (`ClaimTypes.Role`) + `[Authorize(Roles = "Admin")]`
+- **Fetch API** (JavaScript) para los dropdowns en cascada
+- **jQuery Validation** para validar los formularios en el navegador (la edad la valida solo el servidor)
 - **Google Fonts** (Poppins) e iconos SVG de **Lucide**
 
 ---
@@ -128,6 +194,15 @@ dotnet run
 2. Dale a **Sign Up** y crea una cuenta.
 3. Llena tu perfil en **"configura tu nueva cuenta"** → **perfil listo**.
 4. **Sign Out** y vuelve a abrir `/Perfil` → te bloquea otra vez.
+5. Intenta registrarte con una fecha de nacimiento de **menor de 18** → el servidor no crea la cuenta.
+
+### Probar el panel admin
+
+1. Pon tu email en `"Admin": { "Email": ... }` dentro de `appsettings.json` y reinicia la app.
+2. Inicia sesión → caes en el **Dashboard**.
+3. En **Flaguear perfil**, escoge una categoría y mira cómo cambian los motivos.
+4. En **Usuarios**, edita a alguien y ponle una fecha de menor → el servidor no lo guarda.
+5. Inicia sesión con una cuenta normal y abre `/Admin` → **Acceso denegado**.
 
 ---
 
@@ -143,6 +218,16 @@ dotnet run
 | `/Perfil/Editar` | GET / POST | 🔒 | Formulario de edición / guarda los cambios |
 | `/Perfil/Eliminar` | GET / POST | 🔒 | Confirmación / elimina la cuenta |
 | `/Home/Privacy` | GET | 🔒 | Opciones de privacidad |
+| `/Cuenta/AccesoDenegado` | GET | — | Para quien tiene sesión pero no es admin |
+| `/Admin` | GET | 👑 | Dashboard |
+| `/Admin/Usuarios` | GET | 👑 | Lista de usuarios con edad y flags |
+| `/Admin/EditarUsuario/{id}` | GET / POST | 👑 | Corregir un usuario (valida 18+) |
+| `/Admin/EliminarUsuario/{id}` | GET / POST | 👑 | Confirmación / elimina al usuario |
+| `/Admin/NuevoReporte` | GET / POST | 👑 | Flaguear un perfil |
+| `/Admin/MotivosPorCategoria?categoriaId=` | GET | 👑 | JSON con los motivos de una categoría (para la cascada) |
+| `/Admin/MiCuenta` | GET | 👑 | Datos del admin |
+
+🔒 = necesita sesión · 👑 = necesita sesión **y** rol Admin
 
 ---
 
@@ -159,6 +244,11 @@ dotnet run
 | `Url.IsLocalUrl(ReturnUrl)` | **Open redirect** (usar el login para mandarte a una web falsa) |
 | Mensaje genérico "Email o contraseña incorrectos" | Averiguar qué emails están registrados |
 | Índices **únicos** en email y nombre de usuario | Cuentas duplicadas |
+| `[Authorize(Roles = "Admin")]` en `AdminController` | Que un usuario normal entre al panel escribiendo `/Admin` en la URL |
+| `OnActionExecuting` en `PerfilController` | Que el admin termine en páginas de usuario normal |
+| **Edad 18+ validada en el servidor** (`Edad.cs`) | Que un menor se registre o que alguien cambie su fecha, aunque se salte el navegador |
+| El servidor comprueba que el **motivo pertenezca a la categoría** | Guardar reportes incoherentes editando el HTML del formulario |
+| El admin no puede editar ni eliminar a **otro admin** | Que se borre la única cuenta con permisos |
 
 ---
 
@@ -169,20 +259,25 @@ SecretParty/
 ├── Program.cs               # Configuración: base de datos, cookies, rutas
 ├── Controllers/
 │   ├── HomeController.cs    # Inicio y Privacidad
-│   ├── CuentaController.cs  # Registro, Login, Logout
-│   └── PerfilController.cs  # Ver, Editar, Eliminar perfil  🔒
+│   ├── CuentaController.cs  # Registro, Login, Logout, Acceso denegado
+│   ├── PerfilController.cs  # Ver, Editar, Eliminar perfil  🔒
+│   └── AdminController.cs   # Dashboard, usuarios y reportes  👑
 ├── Models/
 │   ├── Usuario.cs           # Entidad que se guarda en la base de datos
+│   ├── Reporte.cs           # CategoriaReporte, MotivoReporte y Reporte
+│   ├── Edad.cs              # Regla de 18+ (validación del dato sensible)
 │   ├── CuentaViewModels.cs  # Formularios de Login y Registro
-│   └── PerfilViewModels.cs  # Formulario de Editar perfil
+│   ├── PerfilViewModels.cs  # Formulario de Editar perfil
+│   └── AdminViewModels.cs   # Dashboard, editar usuario y flaguear
 ├── Data/
 │   └── AppDbContext.cs      # Contexto de Entity Framework
 ├── Migrations/              # Migraciones de la base de datos
 ├── Views/
 │   ├── Shared/              # _Layout (marco común) e _Icono (iconos SVG)
 │   ├── Home/                # Index, Privacy
-│   ├── Cuenta/              # Login, Registro
-│   └── Perfil/              # Index, Editar, Eliminar
+│   ├── Cuenta/              # Login, Registro, AccesoDenegado
+│   ├── Perfil/              # Index, Editar, Eliminar
+│   └── Admin/               # Index, Usuarios, EditarUsuario, EliminarUsuario, NuevoReporte, MiCuenta
 ├── wwwroot/
 │   ├── css/site.css         # Todo el diseño
 │   └── img/                 # Logos y patrón de fondo
@@ -201,6 +296,9 @@ El *Control inteligente de aplicaciones* de Windows 11 bloquea los programas que
 
 ## 🔮 Próximos pasos
 
+- [ ] Deploy en un servidor
+- [ ] Tabla real de eventos para reemplazar el mock up del dashboard
+- [ ] Que los usuarios puedan flaguear perfiles desde la app
 - [ ] Subir foto de perfil
 - [ ] Crear *hangs* (fiestas) con fotos
 - [ ] Ver solicitudes y mensajes
