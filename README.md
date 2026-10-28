@@ -16,6 +16,10 @@
   <img src="https://img.shields.io/badge/CSS-hecho_a_mano-D6C9FE" alt="CSS hecho a mano">
 </p>
 
+<p align="center">
+  🌐 <b>Demo en línea:</b> <a href="https://secretparty.runasp.net">secretparty.runasp.net</a>
+</p>
+
 ---
 
 ## 📋 Tabla de contenidos
@@ -147,7 +151,7 @@ Al arrancar, la app busca esa cuenta y le pone `EsAdmin = true`. Primero hay que
 | Validación en el **back-end** de un **dato sensible** | La **edad (18+)**. La regla está en [`Models/Edad.cs`](Models/Edad.cs) y se revisa en el **controlador**, antes de `SaveChanges()`, en `Cuenta/Registro`, `Perfil/Editar` y `Admin/EditarUsuario`. **No hay JavaScript** validando la edad: aunque alguien envíe el formulario a mano, el servidor lo rechaza. |
 | Las **claves foráneas** se eligen con **dropdown**, no con un input | En *Flaguear perfil* el perfil, la categoría y el motivo son `<select>`. El de motivos está **en cascada**: al cambiar la categoría, JavaScript llama a `/Admin/MotivosPorCategoria?categoriaId=…` y lo rellena solo con los motivos de esa categoría. El servidor además comprueba que el motivo **sí pertenezca** a la categoría. |
 | Código versionado en **Git** con README | Este repositorio |
-| **Deploy** en un servidor (no localhost) | ⏳ Pendiente |
+| **Deploy** en un servidor (no localhost) | **https://secretparty.runasp.net**, en [MonsterASP.NET](https://www.monsterasp.net) (hosting gratis de .NET, con HTTPS de Let's Encrypt). Se publica con `dotnet publish -c Release` y se sube por FTPS. |
 
 ---
 
@@ -296,7 +300,7 @@ El *Control inteligente de aplicaciones* de Windows 11 bloquea los programas que
 
 ## 🔮 Próximos pasos
 
-- [ ] Deploy en un servidor
+- [x] Deploy en un servidor
 - [ ] Tabla real de eventos para reemplazar el mock up del dashboard
 - [ ] Que los usuarios puedan flaguear perfiles desde la app
 - [ ] Subir foto de perfil
