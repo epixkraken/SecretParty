@@ -13,7 +13,7 @@ namespace SecretParty.Models
         [Display(Name = "Contraseña")]
         public string Password { get; set; } = string.Empty;
 
-        // La página protegida a la que querías entrar antes del login
+        // pagina protegida que se quiere entrar sin login
         public string? ReturnUrl { get; set; }
     }
 
