@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SecretParty.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using SecretParty.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Nuestro servicio para guardar/borrar fotos. "Scoped" = uno nuevo por cada petición.
+// Los controladores lo reciben en su constructor (inyección de dependencias), igual que AppDbContext.
+builder.Services.AddScoped<AlmacenFotos>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -44,6 +49,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// MapStaticAssets (abajo) solo conoce los archivos que existían al COMPILAR la app.
+// Las fotos que suben los usuarios aparecen después, así que UseStaticFiles las sirve
+// leyendo wwwroot en el momento (ej: /uploads/perfiles/abc.jpg).
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthentication();

@@ -8,7 +8,9 @@
 
 <h1 class="titulo">configura tu <em>nueva cuenta</em></h1>
 
-<form asp-action="Editar" method="post" class="tarjeta-verde">
+@* enctype="multipart/form-data" es OBLIGATORIO para mandar archivos.
+   Sin eso, el navegador solo manda el nombre del archivo y no la foto. *@
+<form asp-action="Editar" method="post" enctype="multipart/form-data" class="tarjeta-verde">
     <div asp-validation-summary="ModelOnly" class="error"></div>
 
     <div class="campo">
@@ -39,7 +41,32 @@
         <input asp-for="Instagram" class="input" placeholder="@@tuusuario" />
     </div>
 
-    <p class="nota">subir foto de perfil: próximamente</p>
+    <div class="campo subir-foto">
+        <!-- Vista previa: la foto actual, o la nueva apenas la eliges (lo hace site.js) -->
+        <div class="avatar avatar-chico" id="vista-previa">
+            @if (!string.IsNullOrEmpty(Model.FotoActual))
+            {
+                <img src="@Model.FotoActual" alt="Tu foto" class="avatar-foto" />
+            }
+            else
+            {
+                @(string.IsNullOrEmpty(Model.NombreUsuario) ? "?" : Model.NombreUsuario[0])
+            }
+        </div>
+
+        <div>
+            <!-- El input de archivo real va escondido; el label hace de "botón" -->
+            <label for="Foto" class="link-galeria">subir foto de perfil: <em>seleccionar de galería</em></label>
+            <input asp-for="Foto" type="file" accept="image/png, image/jpeg, image/webp, image/gif"
+                   class="input-archivo" data-vista-previa="vista-previa" />
+            <span asp-validation-for="Foto" class="error"></span>
+
+            @if (!string.IsNullOrEmpty(Model.FotoActual))
+            {
+                <label class="check-quitar"><input asp-for="QuitarFoto" /> quitar mi foto</label>
+            }
+        </div>
+    </div>
 
     <div class="acciones">
         <button type="submit" class="boton boton-lila">perfil listo</button>

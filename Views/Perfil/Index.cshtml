@@ -10,10 +10,7 @@
 <!-- Tarjeta principal: foto, nombre y descripción -->
 <section class="tarjeta">
     <div class="perfil-cabecera">
-        <div class="avatar">
-            @Model.NombreUsuario[0]
-            <a asp-action="Editar" class="avatar-lapiz" title="Editar perfil"><partial name="_Icono" model='"lapiz"' /></a>
-        </div>
+        <partial name="_Avatar" model="Model" view-data='new ViewDataDictionary(ViewData) { ["Editable"] = true }' />
         <div>
             <h2 class="perfil-nombre">@Model.NombreUsuario</h2>
             <p class="perfil-descripcion">

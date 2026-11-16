@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SecretParty.Data;
 using SecretParty.Models;
+using SecretParty.Servicios;
 
 namespace SecretParty.Controllers
 {
@@ -17,10 +18,12 @@ namespace SecretParty.Controllers
         public const int LimiteReportes = 3;
 
         private readonly AppDbContext _db;
+        private readonly AlmacenFotos _fotos;
 
-        public AdminController(AppDbContext db)
+        public AdminController(AppDbContext db, AlmacenFotos fotos)
         {
             _db = db;
+            _fotos = fotos;
         }
 
         // ---------- DASHBOARD ----------
@@ -154,6 +157,7 @@ namespace SecretParty.Controllers
                 return RedirectToAction(nameof(Usuarios));
             }
 
+            _fotos.Borrar(usuario.FotoPerfil);
             _db.Usuarios.Remove(usuario);
             await _db.SaveChangesAsync();
             TempData["Mensaje"] = $"Se eliminó a {usuario.NombreUsuario}.";

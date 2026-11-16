@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using SecretParty.Data;
 using SecretParty.Models;
+using SecretParty.Servicios;
 
 namespace SecretParty.Controllers
 {
@@ -14,10 +15,12 @@ namespace SecretParty.Controllers
     public class PerfilController : Controller
     {
         private readonly AppDbContext _db;
+        private readonly AlmacenFotos _fotos;
 
-        public PerfilController(AppDbContext db)
+        public PerfilController(AppDbContext db, AlmacenFotos fotos)
         {
             _db = db;
+            _fotos = fotos;
         }
 
         // Se ejecuta ANTES de cualquier acción de este controlador.
@@ -51,7 +54,8 @@ namespace SecretParty.Controllers
                 Descripcion = usuario.Descripcion,
                 FechaNacimiento = usuario.FechaNacimiento,
                 Intereses = usuario.Intereses,
-                Instagram = usuario.Instagram
+                Instagram = usuario.Instagram,
+                FotoActual = usuario.FotoPerfil
             };
             return View(model);
         }
@@ -69,6 +73,17 @@ namespace SecretParty.Controllers
             if (errorEdad != null)
                 ModelState.AddModelError(nameof(model.FechaNacimiento), errorEdad);
 
+            // Si eligió una foto, revisamos que sea una imagen de verdad y no muy pesada
+            if (model.Foto != null)
+            {
+                var errorFoto = _fotos.Validar(model.Foto);
+                if (errorFoto != null)
+                    ModelState.AddModelError(nameof(model.Foto), errorFoto);
+            }
+
+            // Si volvemos al formulario, que siga mostrando la foto que ya tenía
+            model.FotoActual = usuario.FotoPerfil;
+
             if (!ModelState.IsValid) return View(model);
 
             // El nombre no puede estar ocupado por OTRA persona
@@ -76,6 +91,19 @@ namespace SecretParty.Controllers
             {
                 ModelState.AddModelError(nameof(model.NombreUsuario), "Ese nombre de usuario ya está ocupado");
                 return View(model);
+            }
+
+            // Foto nueva: guardamos la nueva y borramos la vieja del disco
+            if (model.Foto != null)
+            {
+                var vieja = usuario.FotoPerfil;
+                usuario.FotoPerfil = await _fotos.Guardar(model.Foto, "perfiles");
+                _fotos.Borrar(vieja);
+            }
+            else if (model.QuitarFoto)
+            {
+                _fotos.Borrar(usuario.FotoPerfil);
+                usuario.FotoPerfil = null;
             }
 
             usuario.NombreUsuario = model.NombreUsuario;
@@ -109,6 +137,7 @@ namespace SecretParty.Controllers
             var usuario = await ObtenerUsuarioActual();
             if (usuario != null)
             {
+                _fotos.Borrar(usuario.FotoPerfil); // que la foto no quede huérfana en el disco
                 _db.Usuarios.Remove(usuario);
                 await _db.SaveChangesAsync();
             }

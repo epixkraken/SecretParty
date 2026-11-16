@@ -1,0 +1,22 @@
+@model SecretParty.Models.Usuario
+@*
+    Círculo con la foto de perfil. Si la persona no tiene foto, muestra su inicial.
+    Uso:  <partial name="_Avatar" model="usuario" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+    - ViewData["Clase"]    -> tamaño/estilo extra (avatar-chico, avatar-mini...)
+    - ViewData["Editable"] -> true = muestra el lápiz amarillo que lleva a Editar perfil
+*@
+<div class="avatar @ViewData["Clase"]">
+    @if (!string.IsNullOrEmpty(Model.FotoPerfil))
+    {
+        <img src="@Model.FotoPerfil" alt="Foto de @Model.NombreUsuario" class="avatar-foto" />
+    }
+    else
+    {
+        @Model.NombreUsuario[0]
+    }
+
+    @if (ViewData["Editable"] is true)
+    {
+        <a asp-controller="Perfil" asp-action="Editar" class="avatar-lapiz" title="Editar perfil"><partial name="_Icono" model='"lapiz"' /></a>
+    }
+</div>

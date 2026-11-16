@@ -21,7 +21,7 @@
             var esMenor = edad < Edad.Minima;
 
             <li class="@(enRiesgo || esMenor ? "fila-riesgo" : "")">
-                <div class="avatar avatar-chico">@u.NombreUsuario[0]</div>
+                <partial name="_Avatar" model="u" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
                 <div class="fila-datos">
                     <strong>@u.NombreUsuario</strong>
                     @if (u.EsAdmin)

@@ -7,6 +7,9 @@
 docs/APUNTES.md
 docs/APUNTES.pdf
 
+# Fotos que suben los usuarios (se generan al usar la app, no son código)
+wwwroot/uploads/
+
 # dotenv files
 .env
 

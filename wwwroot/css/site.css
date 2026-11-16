@@ -367,6 +367,54 @@ textarea.input {
   stroke-width: 1.5;
 }
 
+/* La foto llena todo el círculo sin deformarse */
+.avatar-foto {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover; /* recorta lo que sobra en vez de estirar la foto */
+}
+
+/* "subir foto de perfil: seleccionar de galería" */
+.subir-foto {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.subir-foto .avatar-chico {
+  width: 64px;
+  height: 64px;
+  font-size: 28px;
+}
+
+.link-galeria {
+  font-size: 14px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.link-galeria em {
+  text-decoration: underline;
+}
+
+/* El input de archivo de verdad: invisible pero sigue funcionando
+   (si usáramos display:none, algunos navegadores no lo dejan validar) */
+.input-archivo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.check-quitar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
 .perfil-nombre {
   font-size: 32px;
   font-weight: 400;

@@ -22,5 +22,15 @@ namespace SecretParty.Models
         public string? Intereses { get; set; }
 
         public string? Instagram { get; set; }
+
+        // El archivo que llega desde <input type="file">. Es opcional: si no eliges nada, se queda la foto que tenías.
+        [Display(Name = "Foto de perfil")]
+        public IFormFile? Foto { get; set; }
+
+        // Solo para MOSTRAR la foto actual en el formulario (no se guarda desde aquí)
+        public string? FotoActual { get; set; }
+
+        // Checkbox "quitar mi foto"
+        public bool QuitarFoto { get; set; }
     }
 }

@@ -67,9 +67,9 @@
                 @foreach (var r in Model.UltimosReportes)
                 {
                     <li>
-                        <div class="avatar avatar-chico">@r.UsuarioReportado!.NombreUsuario[0]</div>
+                        <partial name="_Avatar" model="r.UsuarioReportado!" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
                         <div>
-                            <strong>@r.UsuarioReportado.NombreUsuario</strong>
+                            <strong>@r.UsuarioReportado!.NombreUsuario</strong>
                             <div class="nota">@r.Motivo!.Categoria!.Nombre · @r.Motivo.Nombre</div>
                         </div>
                     </li>
