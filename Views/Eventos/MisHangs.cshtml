@@ -1,0 +1,51 @@
+@model MisHangsViewModel
+@{
+    ViewData["Title"] = "My Hangs";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">My <em>Hangs</em></h1>
+
+<partial name="_MenuApp" />
+
+@* Una sección por lista. Si está vacía, mostramos un mensajito en vez de nada. *@
+
+<h2 class="subtitulo seccion">Organizo</h2>
+@if (Model.Organizo.Count == 0)
+{
+    <p class="nota">Todavía no organizas nada. <a asp-action="Crear">Crea tu primer hang</a></p>
+}
+else
+{
+    <div class="grilla-eventos">
+        @foreach (var t in Model.Organizo) { <partial name="_TarjetaEvento" model="t" /> }
+    </div>
+}
+
+<h2 class="subtitulo seccion">Voy a ir</h2>
+@if (Model.Voy.Count == 0)
+{
+    <p class="nota">Nada por ahora. <a asp-action="Index">Explora hangs</a></p>
+}
+else
+{
+    <div class="grilla-eventos">
+        @foreach (var t in Model.Voy) { <partial name="_TarjetaEvento" model="t" /> }
+    </div>
+}
+
+@if (Model.Pendientes.Count > 0)
+{
+    <h2 class="subtitulo seccion">Esperando respuesta</h2>
+    <div class="grilla-eventos">
+        @foreach (var t in Model.Pendientes) { <partial name="_TarjetaEvento" model="t" /> }
+    </div>
+}
+
+@if (Model.Pasados.Count > 0)
+{
+    <h2 class="subtitulo seccion">Hangs pasados</h2>
+    <div class="grilla-eventos">
+        @foreach (var t in Model.Pasados) { <partial name="_TarjetaEvento" model="t" /> }
+    </div>
+}

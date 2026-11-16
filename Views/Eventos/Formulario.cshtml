@@ -1,0 +1,130 @@
+@model EventoFormViewModel
+@*
+    UNA sola vista para Crear y Editar: si Id es 0 es nuevo, si no, se está editando.
+    El controlador la llama con View("Formulario", model).
+*@
+@{
+    var esNuevo = Model.Id == 0;
+    var esAdmin = User.IsInRole("Admin");
+    ViewData["Title"] = esNuevo ? "Nuevo Hang" : "Editar Hang";
+    ViewData["Fondo"] = "fondo-liso";
+}
+
+<partial name="_MenuApp" />
+
+<h1 class="titulo">
+    @if (esNuevo)
+    {
+        @(esAdmin ? "nuevo evento " : "nuevo ")<em>@(esAdmin ? "oficial" : "hang")</em>
+    }
+    else
+    {
+        <text>editar <em>hang</em></text>
+    }
+</h1>
+
+<form asp-action="@(esNuevo ? "Crear" : "Editar")" method="post" enctype="multipart/form-data" class="tarjeta-verde">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="error"></div>
+
+    @if (esAdmin && esNuevo)
+    {
+        <p class="aviso">✦ Se publicará como evento oficial de Secret Party y saldrá primero en Explorar.</p>
+    }
+
+    <!-- Portada: la vista previa usa el mismo JS que la foto de perfil -->
+    <div class="campo">
+        <label for="Foto">Foto de portada</label>
+        <label for="Foto" class="portada-previa" id="previa-portada">
+            @if (!string.IsNullOrEmpty(Model.FotoActual))
+            {
+                <img src="@Model.FotoActual" alt="Portada actual" />
+            }
+            else
+            {
+                <span class="nota"><em>seleccionar de galería</em></span>
+            }
+        </label>
+        <input asp-for="Foto" type="file" accept="image/png, image/jpeg, image/webp, image/gif"
+               class="input-archivo" data-vista-previa="previa-portada" />
+        <span asp-validation-for="Foto" class="error"></span>
+        @if (!string.IsNullOrEmpty(Model.FotoActual))
+        {
+            <label class="check-quitar"><input asp-for="QuitarFoto" /> quitar la portada</label>
+        }
+    </div>
+
+    <div class="campo">
+        <label asp-for="Titulo"></label>
+        <input asp-for="Titulo" class="input" placeholder="Karaoke night 🎤" />
+        <span asp-validation-for="Titulo" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Descripcion"></label>
+        <textarea asp-for="Descripcion" class="input" placeholder="Trae tu canción favorita..."></textarea>
+        <span asp-validation-for="Descripcion" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="FechaHora"></label>
+        @* type="datetime-local" = el navegador muestra un selector de fecha Y hora *@
+        <input asp-for="FechaHora" type="datetime-local" class="input" />
+        <span asp-validation-for="FechaHora" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Zona"></label>
+        <input asp-for="Zona" class="input" placeholder="Quito · La Floresta" />
+        <span class="ayuda">Esta la ve todo el mundo.</span>
+        <span asp-validation-for="Zona" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Direccion">🔒 Dirección exacta</label>
+        <input asp-for="Direccion" class="input" placeholder="Av. Siempre Viva 742, casa azul" />
+        <span class="ayuda">Solo la verán tus invitados aceptados.</span>
+        <span asp-validation-for="Direccion" class="error"></span>
+    </div>
+
+    <div class="campo">
+        <label asp-for="Cupo"></label>
+        <input asp-for="Cupo" type="number" min="1" max="500" class="input" />
+        <span asp-validation-for="Cupo" class="error"></span>
+    </div>
+
+    <!-- Switch Público / Privado: dos radio buttons con forma de pastilla -->
+    <fieldset class="campo selector-pastillas">
+        <legend>@Html.DisplayNameFor(m => m.EsPublico)</legend>
+        <div class="pastillas">
+            <label class="pastilla">
+                <input type="radio" asp-for="EsPublico" value="true" />
+                <span>Público</span>
+            </label>
+            <label class="pastilla">
+                <input type="radio" asp-for="EsPublico" value="false" />
+                <span>Privado 🔒</span>
+            </label>
+        </div>
+        <span class="ayuda">
+            <strong>Público:</strong> quien toque "Quiero ir" entra directo y ve la dirección.<br />
+            <strong>Privado:</strong> tú aceptas a cada persona antes de que vea la dirección.
+        </span>
+    </fieldset>
+
+    <div class="acciones">
+        <button type="submit" class="boton boton-lila">@(esNuevo ? "publicar" : "guardar")</button>
+        @if (esNuevo)
+        {
+            <a asp-action="MisHangs" class="link-texto">Cancelar</a>
+        }
+        else
+        {
+            <a asp-action="Detalle" asp-route-id="@Model.Id" class="link-texto">Cancelar</a>
+        }
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

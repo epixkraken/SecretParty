@@ -1,0 +1,224 @@
+@model EventoDetalleViewModel
+@{
+    var e = Model.Evento;
+    ViewData["Title"] = e.Titulo;
+    ViewData["Ancho"] = "pantalla-ancha";
+    var estado = Model.MiSolicitud?.Estado;
+    var activo = e.Estado == EstadoEvento.Activo && !Model.YaPaso;
+}
+
+<partial name="_MenuApp" />
+
+<!-- Portada grande -->
+<div class="detalle-portada @(e.EsOficial ? "evento-oficial" : "")">
+    @if (!string.IsNullOrEmpty(e.FotoPortada))
+    {
+        <img src="@e.FotoPortada" alt="Portada de @e.Titulo" />
+    }
+    else
+    {
+        <partial name="_Icono" model='"fiesta"' />
+    }
+    <div class="evento-etiquetas">
+        @if (e.EsOficial)
+        {
+            <span class="etiqueta etiqueta-amarilla">✦ Oficial Secret Party</span>
+        }
+        <span class="etiqueta @(e.EsPublico ? "" : "etiqueta-lila")">@(e.EsPublico ? "Público" : "Privado")</span>
+    </div>
+</div>
+
+<h1 class="titulo detalle-titulo">@e.Titulo</h1>
+
+@* Avisos de estado *@
+@if (e.Estado == EstadoEvento.Cancelado)
+{
+    <p class="aviso aviso-rojo">Este hang fue cancelado por el anfitrión.</p>
+}
+else if (e.Estado == EstadoEvento.Oculto)
+{
+    <p class="aviso aviso-rojo">El equipo de Secret Party ocultó este hang: no aparece en Explorar.</p>
+}
+else if (Model.YaPaso)
+{
+    <p class="aviso">Este hang ya pasó.</p>
+}
+
+<div class="perfil-grid">
+    <section class="tarjeta">
+        <ul class="info-evento">
+            <li>
+                <partial name="_Icono" model='"calendario"' />
+                <span>@Fechas.Larga(e.FechaHora)</span>
+            </li>
+            <li>
+                <partial name="_Icono" model='"pin"' />
+                <span>@e.Zona</span>
+            </li>
+            <li>
+                <partial name="_Icono" model='"candado"' />
+                @* LA REGLA DE PRIVACIDAD: si no puedes verla, la dirección NI SIQUIERA se escribe en el HTML.
+                   Por eso no se puede "descubrir" con Inspeccionar elemento. *@
+                @if (Model.PuedeVerDireccion)
+                {
+                    <span><strong>@e.Direccion</strong></span>
+                }
+                else
+                {
+                    <span class="direccion-oculta">
+                        Dirección secreta ·
+                        @(e.EsPublico ? "se revela cuando te unas" : "se revela cuando el anfitrión te acepte")
+                    </span>
+                }
+            </li>
+            <li>
+                <partial name="_Icono" model='"personas"' />
+                <span>@Model.Invitados.Count de @e.Cupo invitados · @(Model.Libres == 0 ? "lleno" : $"{Model.Libres} lugares libres")</span>
+            </li>
+        </ul>
+
+        @if (!string.IsNullOrWhiteSpace(e.Descripcion))
+        {
+            <p class="detalle-descripcion">@e.Descripcion</p>
+        }
+
+        <div class="anfitrion">
+            <partial name="_Avatar" model="e.Anfitrion!" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+            <div>
+                <div class="nota">Organiza</div>
+                <strong>@(e.EsOficial ? "Secret Party ✦" : e.Anfitrion!.NombreUsuario)</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="tarjeta">
+        @* ---------- LO QUE PUEDO HACER, según quién soy ---------- *@
+        @if (Model.SoyAnfitrion)
+        {
+            <h2 class="subtitulo">Es tu hang</h2>
+            @if (!e.EsPublico && Model.PendientesCount > 0)
+            {
+                <a asp-action="Solicitudes" class="boton boton-lila boton-chico boton-ancho">
+                    Ver solicitudes <span class="contador">@Model.PendientesCount</span>
+                </a>
+            }
+            <div class="acciones acciones-columna">
+                @if (activo)
+                {
+                    <a asp-action="Editar" asp-route-id="@e.Id" class="boton boton-verde boton-chico boton-ancho">Editar</a>
+                    <form asp-action="Cancelar" asp-route-id="@e.Id" method="post" onsubmit="return confirm('¿Cancelar este hang? Tus invitados lo verán como cancelado.')">
+                        <button type="submit" class="boton boton-borde boton-chico boton-ancho">Cancelar hang</button>
+                    </form>
+                }
+                <form asp-action="Eliminar" asp-route-id="@e.Id" method="post" onsubmit="return confirm('¿Eliminar este hang para siempre?')">
+                    <button type="submit" class="link-texto link-peligro boton-link">Eliminar para siempre</button>
+                </form>
+            </div>
+        }
+        else if (Model.SoyAdmin)
+        {
+            <h2 class="subtitulo">Vista de admin</h2>
+            <p class="nota">Ves la dirección para poder moderar. Gestiona este hang desde el panel.</p>
+            <a asp-controller="Admin" asp-action="Eventos" class="boton boton-lila boton-chico">Ir a Eventos del panel</a>
+        }
+        else if (estado == EstadoSolicitud.Aceptada)
+        {
+            <h2 class="subtitulo">¡Estás dentro! 🎉</h2>
+            <p class="nota">Ya puedes ver la dirección. No la compartas: es un secret party 🤫</p>
+            @if (!e.EsOficial)
+            {
+                <a asp-controller="Mensajes" asp-action="Chat" asp-route-id="@e.AnfitrionId" class="boton boton-verde boton-chico">Escribirle a @e.Anfitrion!.NombreUsuario</a>
+            }
+            @if (activo)
+            {
+                <form asp-action="YaNoVoy" asp-route-id="@e.Id" method="post" onsubmit="return confirm('¿Seguro que ya no vas?')">
+                    <button type="submit" class="boton boton-borde boton-chico">Ya no voy</button>
+                </form>
+            }
+        }
+        else if (estado == EstadoSolicitud.Pendiente)
+        {
+            <h2 class="subtitulo">Solicitud enviada 💌</h2>
+            <p class="nota">Esperando a que @e.Anfitrion!.NombreUsuario te acepte.</p>
+            @if (!string.IsNullOrEmpty(Model.MiSolicitud!.Mensaje))
+            {
+                <p class="burbuja">“@Model.MiSolicitud.Mensaje”</p>
+            }
+            <div class="acciones acciones-izquierda">
+                <a asp-controller="Mensajes" asp-action="Chat" asp-route-id="@e.AnfitrionId" class="boton boton-verde boton-chico">Escribirle</a>
+                <form asp-action="YaNoVoy" asp-route-id="@e.Id" method="post">
+                    <button type="submit" class="boton boton-borde boton-chico">Retirar solicitud</button>
+                </form>
+            </div>
+        }
+        else if (estado == EstadoSolicitud.Rechazada)
+        {
+            <h2 class="subtitulo">Esta vez no se pudo</h2>
+            <p class="nota">El anfitrión no aceptó tu solicitud. ¡Hay muchos más hangs!</p>
+            <a asp-action="Index" class="boton boton-lila boton-chico">Explorar</a>
+        }
+        else if (!activo)
+        {
+            <p class="nota">Ya no se puede pedir entrar a este hang.</p>
+        }
+        else if (Model.Libres == 0)
+        {
+            <h2 class="subtitulo">Está lleno 😢</h2>
+            <p class="nota">Ya no quedan lugares.</p>
+        }
+        else
+        {
+            @* Todavía no he pedido entrar: el botón "Quiero ir" *@
+            <form asp-action="QuieroIr" asp-route-id="@e.Id" method="post">
+                @if (e.EsPublico)
+                {
+                    <h2 class="subtitulo">¿Te apuntas?</h2>
+                    <p class="nota">Es público: entras al instante y ves la dirección.</p>
+                }
+                else
+                {
+                    <h2 class="subtitulo">Es privado 🔒</h2>
+                    <p class="nota">Cuéntale al anfitrión por qué quieres ir. Si te acepta, verás la dirección.</p>
+                    <div class="campo">
+                        <textarea name="mensaje" maxlength="300" class="input" placeholder="hola! me encanta el karaoke 🎤"></textarea>
+                    </div>
+                }
+                <button type="submit" class="boton boton-lila">Quiero ir</button>
+            </form>
+        }
+
+        @* ---------- QUIÉNES VAN ---------- *@
+        @if (Model.Invitados.Count > 0)
+        {
+            <h3 class="subtitulo seccion-chica">Quiénes van</h3>
+            <div class="fila-avatares">
+                @foreach (var u in Model.Invitados.Take(12))
+                {
+                    @* El anfitrión puede tocar a un invitado para escribirle *@
+                    if (Model.SoyAnfitrion && !e.EsOficial)
+                    {
+                        <a asp-controller="Mensajes" asp-action="Chat" asp-route-id="@u.Id" class="mini-invitado link-sin-linea" title="Escribirle a @u.NombreUsuario">
+                            <partial name="_Avatar" model="u" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+                            <span>@u.NombreUsuario</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="mini-invitado" title="@u.NombreUsuario">
+                            <partial name="_Avatar" model="u" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+                            <span>@u.NombreUsuario</span>
+                        </div>
+                    }
+                }
+                @if (Model.Invitados.Count > 12)
+                {
+                    <span class="nota">+@(Model.Invitados.Count - 12) más</span>
+                }
+            </div>
+        }
+    </section>
+</div>
+
+<div class="barra-abajo">
+    <a href="javascript:history.back()" class="boton-volver" title="Volver"><partial name="_Icono" model='"volver"' /></a>
+</div>

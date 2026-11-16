@@ -1,0 +1,64 @@
+@model EventoTarjeta
+@*
+    La tarjetita de un evento en las listas. Toda la tarjeta es un link al detalle.
+    Nunca muestra la dirección: solo la zona.
+*@
+@{
+    var e = Model.Evento;
+}
+
+<a asp-controller="Eventos" asp-action="Detalle" asp-route-id="@e.Id"
+   class="evento-card @(e.EsOficial ? "evento-oficial" : "") @(e.Estado != EstadoEvento.Activo ? "evento-apagado" : "")">
+
+    <div class="evento-portada">
+        @if (!string.IsNullOrEmpty(e.FotoPortada))
+        {
+            <img src="@e.FotoPortada" alt="" loading="lazy" />
+        }
+        else
+        {
+            <partial name="_Icono" model='"fiesta"' />
+        }
+
+        <div class="evento-etiquetas">
+            @if (e.EsOficial)
+            {
+                <span class="etiqueta etiqueta-amarilla">✦ Oficial</span>
+            }
+            <span class="etiqueta @(e.EsPublico ? "" : "etiqueta-lila")">@(e.EsPublico ? "Público" : "Privado")</span>
+            @if (e.Estado == EstadoEvento.Cancelado)
+            {
+                <span class="etiqueta etiqueta-roja">Cancelado</span>
+            }
+            else if (e.Estado == EstadoEvento.Oculto)
+            {
+                <span class="etiqueta etiqueta-roja">Oculto</span>
+            }
+        </div>
+    </div>
+
+    <div class="evento-cuerpo">
+        <div class="fecha-evento">
+            <span class="fecha-dia">@Fechas.Dia(e.FechaHora)</span>
+            <span class="fecha-mes">@Fechas.Mes(e.FechaHora)</span>
+        </div>
+        <div class="fila-datos">
+            <strong class="evento-titulo">@e.Titulo</strong>
+            <div class="nota evento-linea"><partial name="_Icono" model='"pin"' /> @e.Zona · @e.FechaHora.ToString("HH:mm")</div>
+            <div class="nota evento-linea">
+                <partial name="_Icono" model='"personas"' />
+                @(Model.Libres == 0 ? "Lleno" : $"{Model.Libres} de {e.Cupo} lugares libres")
+            </div>
+        </div>
+
+        @* Mi estado con este evento, si ya pedí entrar *@
+        @if (Model.MiEstado == EstadoSolicitud.Aceptada)
+        {
+            <span class="etiqueta">Vas ✔</span>
+        }
+        else if (Model.MiEstado == EstadoSolicitud.Pendiente)
+        {
+            <span class="etiqueta etiqueta-amarilla">Pendiente</span>
+        }
+    </div>
+</a>

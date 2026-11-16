@@ -1,0 +1,62 @@
+@model List<Solicitud>
+@{
+    ViewData["Title"] = "Solicitudes";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">Ver <em>solicitudes</em></h1>
+
+<partial name="_MenuApp" />
+
+@if (Model.Count == 0)
+{
+    <section class="tarjeta vacio">
+        <partial name="_Icono" model='"buzon"' />
+        <p>No tienes solicitudes pendientes.</p>
+        <p class="nota">Cuando alguien pida entrar a uno de tus hangs privados, aparecerá aquí.</p>
+    </section>
+}
+else
+{
+    @* GroupBy junta las solicitudes por evento: una tarjeta por cada hang *@
+    @foreach (var grupo in Model.GroupBy(s => s.Evento!))
+    {
+        <section class="tarjeta">
+            <a asp-action="Detalle" asp-route-id="@grupo.Key.Id" class="subtitulo link-sin-linea">@grupo.Key.Titulo</a>
+            <div class="nota">@Fechas.Corta(grupo.Key.FechaHora) · @grupo.Count() esperando</div>
+
+            <ul class="lista-admin">
+                @foreach (var s in grupo)
+                {
+                    <li class="solicitud">
+                        <partial name="_Avatar" model="s.Usuario!" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+                        <div class="fila-datos">
+                            <strong>@s.Usuario!.NombreUsuario</strong>
+                            @if (s.Usuario.FechaNacimiento != null)
+                            {
+                                <span class="nota">· @Edad.Calcular(s.Usuario.FechaNacimiento.Value) años</span>
+                            }
+                            @if (!string.IsNullOrEmpty(s.Mensaje))
+                            {
+                                <p class="burbuja">“@s.Mensaje”</p>
+                            }
+                            @if (!string.IsNullOrEmpty(s.Usuario.Intereses))
+                            {
+                                <div class="nota">Le gusta: @s.Usuario.Intereses</div>
+                            }
+                        </div>
+                        <div class="fila-acciones">
+                            <a asp-controller="Mensajes" asp-action="Chat" asp-route-id="@s.UsuarioId" class="boton-icono" title="Escribirle antes de decidir"><partial name="_Icono" model='"mensaje"' /></a>
+                            <form asp-action="Responder" asp-route-id="@s.Id" asp-route-aceptar="true" method="post">
+                                <button type="submit" class="boton boton-verde boton-chico">Aceptar</button>
+                            </form>
+                            <form asp-action="Responder" asp-route-id="@s.Id" asp-route-aceptar="false" method="post">
+                                <button type="submit" class="boton boton-borde boton-chico">No</button>
+                            </form>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+}

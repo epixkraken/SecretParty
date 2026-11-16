@@ -1,0 +1,76 @@
+@model List<EventoTarjeta>
+@{
+    ViewData["Title"] = "Eventos";
+    ViewData["Ancho"] = "pantalla-ancha";
+    var filtro = ViewBag.Filtro as string;
+    string Activo(string? f) => filtro == f ? "activa" : "";
+}
+
+<h1 class="titulo">Todos los <em>eventos</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<div class="barra-filtros">
+    <div class="filtros">
+        <a asp-action="Eventos" class="filtro @Activo(null)">Todos</a>
+        <a asp-action="Eventos" asp-route-filtro="proximos" class="filtro @Activo("proximos")">Próximos</a>
+        <a asp-action="Eventos" asp-route-filtro="oficiales" class="filtro @Activo("oficiales")">Oficiales</a>
+        <a asp-action="Eventos" asp-route-filtro="ocultos" class="filtro @Activo("ocultos")">Ocultos</a>
+        <a asp-action="Eventos" asp-route-filtro="pasados" class="filtro @Activo("pasados")">Pasados</a>
+    </div>
+    <a asp-controller="Eventos" asp-action="Crear" class="boton boton-lila boton-chico">+ Evento oficial</a>
+</div>
+
+<section class="tarjeta">
+    <p>Eventos: <strong>@Model.Count</strong></p>
+
+    <ul class="lista-admin">
+        @foreach (var t in Model)
+        {
+            var e = t.Evento;
+            <li class="@(e.Estado == EstadoEvento.Oculto ? "fila-riesgo" : "")">
+                <div class="fecha-evento">
+                    <span class="fecha-dia">@Fechas.Dia(e.FechaHora)</span>
+                    <span class="fecha-mes">@Fechas.Mes(e.FechaHora)</span>
+                </div>
+                <div class="fila-datos">
+                    <strong>@e.Titulo</strong>
+                    @if (e.EsOficial)
+                    {
+                        <span class="etiqueta etiqueta-amarilla">✦ Oficial</span>
+                    }
+                    <span class="etiqueta @(e.EsPublico ? "" : "etiqueta-lila")">@(e.EsPublico ? "Público" : "Privado")</span>
+                    @if (e.Estado == EstadoEvento.Cancelado)
+                    {
+                        <span class="etiqueta etiqueta-roja">Cancelado</span>
+                    }
+                    else if (e.Estado == EstadoEvento.Oculto)
+                    {
+                        <span class="etiqueta etiqueta-roja">Oculto</span>
+                    }
+                    <div class="nota">
+                        @e.Zona · @e.FechaHora.ToString("HH:mm") · @t.Aceptados/@e.Cupo van · por @e.Anfitrion!.NombreUsuario
+                    </div>
+                </div>
+
+                <div class="fila-acciones">
+                    <a asp-controller="Eventos" asp-action="Detalle" asp-route-id="@e.Id" title="Ver" class="boton-icono"><partial name="_Icono" model='"ojo"' /></a>
+                    <form asp-action="OcultarEvento" asp-route-id="@e.Id" method="post">
+                        <button type="submit" class="boton-icono" title="@(e.Estado == EstadoEvento.Oculto ? "Volver a mostrar" : "Ocultar de Explorar")">
+                            <partial name="_Icono" model='@(e.Estado == EstadoEvento.Oculto ? "ojo" : "ojo-cerrado")' />
+                        </button>
+                    </form>
+                    <form asp-action="EliminarEvento" asp-route-id="@e.Id" method="post"
+                          onsubmit="return confirm('¿Eliminar este evento para siempre?')">
+                        <button type="submit" class="boton-icono link-peligro" title="Eliminar"><partial name="_Icono" model='"basura"' /></button>
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+
+    @if (Model.Count == 0)
+    {
+        <p class="nota">No hay eventos con este filtro.</p>
+    }
+</section>

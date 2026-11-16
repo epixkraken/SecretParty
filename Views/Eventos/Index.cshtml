@@ -1,0 +1,42 @@
+@model ExplorarViewModel
+@{
+    ViewData["Title"] = "Explorar";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">Find the <em>party</em></h1>
+
+<partial name="_MenuApp" />
+
+@* method="get": los filtros viajan en la URL (/Eventos?buscar=karaoke&tipo=privado),
+   así se puede copiar el link o darle "atrás" sin perder la búsqueda *@
+<form method="get" asp-action="Index" class="buscador">
+    <div class="buscador-caja">
+        <partial name="_Icono" model='"lupa"' />
+        <input name="buscar" value="@Model.Buscar" class="input" placeholder="karaoke, Cumbayá, playa..." />
+    </div>
+
+    <div class="filtros">
+        <a asp-action="Index" asp-route-buscar="@Model.Buscar" class="filtro @(Model.Tipo == null ? "activa" : "")">Todos</a>
+        <a asp-action="Index" asp-route-buscar="@Model.Buscar" asp-route-tipo="publico" class="filtro @(Model.Tipo == "publico" ? "activa" : "")">Públicos</a>
+        <a asp-action="Index" asp-route-buscar="@Model.Buscar" asp-route-tipo="privado" class="filtro @(Model.Tipo == "privado" ? "activa" : "")">Privados</a>
+    </div>
+</form>
+
+@if (Model.Eventos.Count == 0)
+{
+    <section class="tarjeta vacio">
+        <partial name="_Icono" model='"fiesta"' />
+        <p>No hay hangs @(string.IsNullOrEmpty(Model.Buscar) ? "próximos" : $"con \"{Model.Buscar}\"") todavía.</p>
+        <a asp-action="Crear" class="boton boton-lila boton-chico">Organiza uno</a>
+    </section>
+}
+else
+{
+    <div class="grilla-eventos">
+        @foreach (var t in Model.Eventos)
+        {
+            <partial name="_TarjetaEvento" model="t" />
+        }
+    </div>
+}

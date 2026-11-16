@@ -3,14 +3,6 @@
 @{
     ViewData["Title"] = "Panel admin";
     ViewData["Ancho"] = "pantalla-ancha";
-
-    // MOCK UP: todavía no existe la tabla de eventos, estos datos son de ejemplo
-    var eventosMock = new[]
-    {
-        (Nombre: "Karaoke night", Lugar: "Quito · La Floresta", Fecha: "01/11", Asistentes: 24),
-        (Nombre: "Sunset en la playa", Lugar: "Montañita", Fecha: "02/11", Asistentes: 58),
-        (Nombre: "Halloween secret party", Lugar: "Quito · Cumbayá", Fecha: "31/10", Asistentes: 112),
-    };
 }
 
 <h1 class="titulo">Panel <em>admin</em></h1>
@@ -39,20 +31,32 @@
 
 <div class="perfil-grid">
     <section class="tarjeta">
-        <h2 class="subtitulo">Eventos subidos <span class="etiqueta etiqueta-amarilla">mock up</span></h2>
+        <h2 class="subtitulo">Próximos eventos <span class="etiqueta">@Model.EventosProximos</span></h2>
+        @if (Model.ProximosEventos.Count == 0)
+        {
+            <p class="nota">Todavía no hay eventos próximos.</p>
+        }
         <ul class="lista-admin">
-            @foreach (var e in eventosMock)
+            @foreach (var t in Model.ProximosEventos)
             {
+                var e = t.Evento;
                 <li>
-                    <div class="fecha-evento">@e.Fecha</div>
-                    <div>
-                        <strong>@e.Nombre</strong>
-                        <div class="nota">@e.Lugar · @e.Asistentes van</div>
+                    <div class="fecha-evento">
+                        <span class="fecha-dia">@Fechas.Dia(e.FechaHora)</span>
+                        <span class="fecha-mes">@Fechas.Mes(e.FechaHora)</span>
+                    </div>
+                    <div class="fila-datos">
+                        <a asp-controller="Eventos" asp-action="Detalle" asp-route-id="@e.Id" class="link-sin-linea"><strong>@e.Titulo</strong></a>
+                        @if (e.EsOficial)
+                        {
+                            <span class="etiqueta etiqueta-amarilla">✦</span>
+                        }
+                        <div class="nota">@e.Zona · @t.Aceptados/@e.Cupo van · @(e.EsPublico ? "público" : "privado")</div>
                     </div>
                 </li>
             }
         </ul>
-        <p class="nota">Próximamente: los eventos que suban los usuarios.</p>
+        <a asp-action="Eventos" class="link-texto">Ver todos los eventos</a>
     </section>
 
     <section class="tarjeta">
