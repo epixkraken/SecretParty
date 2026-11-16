@@ -1,0 +1,133 @@
+@model CalendarioViewModel
+@{
+    ViewData["Title"] = "Mi calendario";
+    ViewData["Ancho"] = "pantalla-ancha";
+
+    var anterior = Model.PrimerDia.AddMonths(-1);
+    var siguiente = Model.PrimerDia.AddMonths(1);
+    var nombreMes = Model.PrimerDia.ToString("MMMM yyyy", Fechas.Espanol);
+    var diasSemana = new[] { "lun", "mar", "mié", "jue", "vie", "sáb", "dom" };
+
+    // Los eventos del mes que se está viendo (para la lista de abajo)
+    var delMes = Model.Eventos.Where(e => e.Evento.FechaHora.Month == Model.Mes).ToList();
+
+    string ClaseRol(RolEnEvento rol) => rol switch
+    {
+        RolEnEvento.Organizo => "rol-organizo",
+        RolEnEvento.Voy => "rol-voy",
+        _ => "rol-pendiente"
+    };
+}
+
+<h1 class="titulo">Mi <em>calendario</em></h1>
+
+<partial name="_MenuApp" />
+
+<section class="tarjeta calendario">
+    <!-- Cabecera: < noviembre 2026 > -->
+    <div class="cal-cabecera">
+        <a asp-action="Index" asp-route-anio="@anterior.Year" asp-route-mes="@anterior.Month" class="cal-flecha" title="Mes anterior">‹</a>
+        <h2 class="cal-mes">@nombreMes</h2>
+        <a asp-action="Index" asp-route-anio="@siguiente.Year" asp-route-mes="@siguiente.Month" class="cal-flecha" title="Mes siguiente">›</a>
+    </div>
+
+    @if (Model.PrimerDia.Year != Model.Hoy.Year || Model.PrimerDia.Month != Model.Hoy.Month)
+    {
+        <div class="centrado"><a asp-action="Index" class="link-texto">volver a hoy</a></div>
+    }
+
+    <!-- La cuadrícula: 7 columnas (lunes a domingo) hecha con CSS Grid -->
+    <div class="cal-grilla">
+        @foreach (var d in diasSemana)
+        {
+            <div class="cal-dia-semana">@d</div>
+        }
+
+        @for (int i = 0; i < Model.Semanas * 7; i++)
+        {
+            var dia = Model.InicioCuadricula.AddDays(i);
+            var eventos = Model.DelDia(dia);
+            var esOtroMes = dia.Month != Model.Mes;
+            var esHoy = dia == Model.Hoy;
+            var clases = $"cal-celda {(esOtroMes ? "otro-mes" : "")} {(esHoy ? "hoy" : "")} {(eventos.Count > 0 ? "con-eventos" : "")}";
+
+            @* Si el día tiene hangs, la celda es un link que baja a la lista de ese día *@
+            if (eventos.Count > 0 && !esOtroMes)
+            {
+                <a href="#dia-@dia.Day" class="@clases">
+                    <span class="cal-numero">@dia.Day</span>
+                    <span class="cal-puntos">
+                        @foreach (var e in eventos.Take(3))
+                        {
+                            <span class="cal-punto @ClaseRol(e.Rol)"></span>
+                        }
+                    </span>
+                    @foreach (var e in eventos.Take(2))
+                    {
+                        <span class="cal-chip @ClaseRol(e.Rol)">@e.Evento.FechaHora.ToString("HH:mm") @e.Evento.Titulo</span>
+                    }
+                    @if (eventos.Count > 2)
+                    {
+                        <span class="cal-mas">+@(eventos.Count - 2)</span>
+                    }
+                </a>
+            }
+            else
+            {
+                <div class="@clases">
+                    <span class="cal-numero">@dia.Day</span>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Qué significa cada color -->
+    <div class="cal-leyenda">
+        <span><span class="cal-punto rol-organizo"></span> organizo</span>
+        <span><span class="cal-punto rol-voy"></span> voy</span>
+        <span><span class="cal-punto rol-pendiente"></span> esperando respuesta</span>
+    </div>
+</section>
+
+<!-- La lista de hangs del mes, agrupada por día -->
+@if (delMes.Count == 0)
+{
+    <section class="tarjeta vacio">
+        <partial name="_Icono" model='"calendario"' />
+        <p>No tienes hangs en @Model.PrimerDia.ToString("MMMM", Fechas.Espanol).</p>
+        <a asp-controller="Eventos" asp-action="Index" class="boton boton-lila boton-chico">Explorar hangs</a>
+    </section>
+}
+else
+{
+    @foreach (var grupo in delMes.GroupBy(e => e.Evento.FechaHora.Date))
+    {
+        <section class="tarjeta cal-dia-lista" id="dia-@grupo.Key.Day">
+            <h3 class="subtitulo">@grupo.Key.ToString("dddd d 'de' MMMM", Fechas.Espanol)</h3>
+            <ul class="lista-admin">
+                @foreach (var e in grupo)
+                {
+                    var ev = e.Evento;
+                    <li>
+                        <span class="cal-punto cal-punto-grande @ClaseRol(e.Rol)"></span>
+                        <div class="fila-datos">
+                            <a asp-controller="Eventos" asp-action="Detalle" asp-route-id="@ev.Id" class="link-sin-linea"><strong>@ev.Titulo</strong></a>
+                            @if (ev.Estado == EstadoEvento.Cancelado)
+                            {
+                                <span class="etiqueta etiqueta-roja">Cancelado</span>
+                            }
+                            <div class="nota">
+                                @ev.FechaHora.ToString("HH:mm") · @ev.Zona ·
+                                @(e.Rol switch { RolEnEvento.Organizo => "organizas tú", RolEnEvento.Voy => "vas", _ => "esperando respuesta" })
+                            </div>
+                        </div>
+                        @if (e.Rol != RolEnEvento.Pendiente && ev.Estado == EstadoEvento.Activo)
+                        {
+                            <a asp-action="Ics" asp-route-id="@ev.Id" class="boton-icono" title="Agregar a mi calendario (.ics)"><partial name="_Icono" model='"calendario"' /></a>
+                        }
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+}

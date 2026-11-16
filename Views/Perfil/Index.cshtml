@@ -65,6 +65,11 @@
                 </a>
             </li>
             <li>
+                <a asp-controller="Calendario" asp-action="Index">
+                    <span class="menu-icono"><partial name="_Icono" model='"calendario"' /></span> Mi calendario
+                </a>
+            </li>
+            <li>
                 <a asp-controller="Mensajes" asp-action="Index">
                     <span class="menu-icono"><partial name="_Icono" model='"mensaje"' /></span> Mensajes
                     @if (ViewBag.NoLeidos > 0)

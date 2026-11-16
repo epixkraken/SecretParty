@@ -187,6 +187,17 @@ else if (Model.YaPaso)
             </form>
         }
 
+        @* ---------- AGREGAR A MI CALENDARIO (solo si veo la dirección y el hang sigue en pie) ---------- *@
+        @if (activo && (Model.SoyAnfitrion || estado == EstadoSolicitud.Aceptada))
+        {
+            var urlDetalle = Url.Action("Detalle", "Eventos", new { id = e.Id }, Context.Request.Scheme)!;
+            <div class="agregar-calendario">
+                <span class="nota">Agregar a mi calendario:</span>
+                <a href="@CalendarioController.LinkGoogle(e, urlDetalle)" target="_blank" rel="noopener" class="filtro">Google Calendar</a>
+                <a asp-controller="Calendario" asp-action="Ics" asp-route-id="@e.Id" class="filtro">iPhone / Outlook (.ics)</a>
+            </div>
+        }
+
         @* ---------- QUIÉNES VAN ---------- *@
         @if (Model.Invitados.Count > 0)
         {

@@ -1336,6 +1336,157 @@ button.boton-icono {
   height: 24px;
 }
 
+/* ---------- 10e. CALENDARIO ---------- */
+
+/* Los colores de cada papel: organizo = lila, voy = verde, pendiente = amarillo */
+.rol-organizo { background-color: var(--lila-fuerte); }
+.rol-voy { background-color: #9fe870; } /* un verde más fuerte que --verde, para que el puntito se vea */
+.rol-pendiente { background-color: #f2e15c; }
+
+.cal-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cal-mes {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  text-transform: capitalize; /* "noviembre 2026" -> "Noviembre 2026" */
+}
+
+.cal-flecha {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--lila);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+/* La cuadrícula: 7 columnas iguales. repeat(7, 1fr) = "7 columnas de 1 fracción cada una" */
+.cal-grilla {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 12px 0;
+}
+
+.cal-dia-semana {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  padding-bottom: 4px;
+}
+
+.cal-celda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-height: 48px;
+  padding: 6px 2px;
+  border-radius: 11px;
+  text-decoration: none;
+  min-width: 0; /* deja que los chips se recorten en vez de agrandar la columna */
+}
+
+.cal-numero {
+  font-size: 14px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Días del mes anterior/siguiente: grises */
+.otro-mes .cal-numero {
+  color: #c4c4c4;
+}
+
+/* Hoy: el número dentro de un círculo negro */
+.hoy .cal-numero {
+  background-color: var(--texto);
+  color: var(--blanco);
+  font-weight: 700;
+}
+
+.con-eventos {
+  background-color: #f4f3f7;
+}
+
+.con-eventos:hover {
+  background-color: var(--amarillo);
+}
+
+.cal-puntos {
+  display: flex;
+  gap: 3px;
+}
+
+.cal-punto {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--borde);
+}
+
+.cal-punto-grande {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Los chips con el nombre del hang: escondidos en celular (no caben) */
+.cal-chip,
+.cal-mas {
+  display: none;
+}
+
+.cal-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.cal-leyenda > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Cuando tocas un día, la página baja a su lista; scroll-margin deja un poquito de aire arriba */
+.cal-dia-lista {
+  scroll-margin-top: 16px;
+}
+
+.cal-dia-lista .subtitulo {
+  text-transform: capitalize;
+}
+
+/* :target = el elemento al que apunta el # de la URL (ej: #dia-22). Lo resaltamos */
+.cal-dia-lista:target {
+  box-shadow: 0 0 0 3px var(--lila-fuerte);
+}
+
+.agregar-calendario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
 /* ---------- 11. RESPONSIVE: pantallas grandes ----------
    Todo lo de arriba es para celular. Aquí decimos:
    "si la pantalla mide 768px o más (tablet/compu), cambia esto". */
@@ -1385,6 +1536,37 @@ button.boton-icono {
 
   .detalle-portada {
     height: 300px;
+  }
+
+  /* En compu el calendario tiene espacio: celdas altas, sin puntitos y con chips de texto */
+  .cal-celda {
+    min-height: 92px;
+    align-items: stretch;
+  }
+
+  .cal-numero {
+    align-self: flex-start;
+  }
+
+  .cal-puntos {
+    display: none;
+  }
+
+  .cal-chip {
+    display: block;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cal-mas {
+    display: block;
+    font-size: 11px;
+    color: #555;
+    padding-left: 6px;
   }
 }
 

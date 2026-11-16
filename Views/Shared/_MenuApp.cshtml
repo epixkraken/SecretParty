@@ -44,6 +44,7 @@
                 <span class="contador">@pendientes</span>
             }
         </a>
+        <a asp-controller="Calendario" asp-action="Index" class="@(controlador == "Calendario" ? "activa" : "")">Calendario</a>
         <a asp-controller="Mensajes" asp-action="Index" class="@(controlador == "Mensajes" ? "activa" : "")">
             Mensajes
             @if (noLeidos > 0)
