@@ -1,8 +1,8 @@
 @{
     ViewData["Title"] = "Bienvenida";
-    // Admin -> su panel; usuario con sesión -> su perfil; sin sesión -> al login
+    // Admin -> su panel; usuario con sesión -> a explorar hangs; sin sesión -> al login
     var destino = User.IsInRole("Admin") ? Url.Action("Index", "Admin")
-        : User.Identity?.IsAuthenticated == true ? Url.Action("Index", "Perfil")
+        : User.Identity?.IsAuthenticated == true ? Url.Action("Index", "Eventos")
         : Url.Action("Login", "Cuenta");
 }
 

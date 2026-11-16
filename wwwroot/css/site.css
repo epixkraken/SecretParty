@@ -407,7 +407,8 @@ textarea.input {
   opacity: 0;
 }
 
-.check-quitar {
+.check-quitar,
+.campo .check-quitar {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -739,6 +740,602 @@ select.input {
   cursor: pointer;
 }
 
+/* ---------- 10c. EVENTOS ("HANGS") ---------- */
+
+/* El numerito rojo de solicitudes pendientes */
+.contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: 4px;
+  border-radius: 999px;
+  background-color: var(--error);
+  color: var(--blanco);
+  font-size: 12px;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.etiqueta-lila {
+  background-color: var(--lila);
+}
+
+/* Los botones con icono también pueden ser <button> (para formularios POST) */
+button.boton-icono {
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link-sin-linea {
+  text-decoration: none;
+}
+
+.boton-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.boton-ancho {
+  display: block;
+  width: 100%;
+}
+
+.acciones-columna {
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 12px;
+}
+
+.seccion {
+  margin: 28px 0 12px;
+}
+
+.seccion-chica {
+  font-size: 16px;
+  margin-top: 24px;
+}
+
+/* Textito gris debajo de un input ("Solo la verán tus invitados aceptados") */
+.ayuda {
+  display: block;
+  font-size: 12px;
+  margin: 6px 0 0 12px;
+  color: #555;
+}
+
+/* Cuando una lista está vacía: icono grande + mensaje centrado */
+.vacio {
+  text-align: center;
+  padding: 36px 20px;
+}
+
+.vacio > .icono {
+  width: 56px;
+  height: 56px;
+  color: var(--lila-fuerte);
+  stroke-width: 1.5;
+}
+
+/* --- Buscador y filtros de Explorar --- */
+.buscador {
+  margin-bottom: 20px;
+}
+
+/* La lupa va DENTRO del input: el contenedor es relative y la lupa absolute */
+.buscador-caja {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.buscador-caja .icono {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%); /* la sube la mitad de su alto = centrada */
+  width: 20px;
+  height: 20px;
+  color: var(--placeholder);
+}
+
+.buscador-caja .input {
+  padding-left: 48px; /* espacio para la lupa */
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filtro {
+  padding: 4px 16px;
+  border: 2px solid var(--borde);
+  border-radius: 45px;
+  background-color: var(--blanco);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.filtro.activa {
+  background-color: var(--lila);
+  font-weight: 600;
+}
+
+.barra-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* --- Las tarjetas de eventos --- */
+.grilla-eventos {
+  display: grid;
+  grid-template-columns: 1fr; /* celular: una columna */
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.evento-card {
+  display: block;
+  background-color: var(--blanco);
+  border-radius: 20px;
+  overflow: hidden; /* que la foto respete las esquinas redondas */
+  text-decoration: none;
+  transition: transform 0.15s;
+}
+
+.evento-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Los oficiales de Secret Party llevan borde amarillo */
+.evento-oficial {
+  box-shadow: 0 0 0 3px var(--amarillo), 0 0 0 5px var(--borde);
+}
+
+/* Cancelados / ocultos: más apagaditos */
+.evento-apagado {
+  opacity: 0.6;
+}
+
+/* La foto de portada. Si no hay foto, un degradado lila -> verde con el icono de fiesta */
+.evento-portada,
+.detalle-portada {
+  position: relative;
+  height: 150px;
+  background: linear-gradient(135deg, var(--lila), var(--verde));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.evento-portada img,
+.detalle-portada img {
+  position: absolute;
+  inset: 0; /* = top:0; right:0; bottom:0; left:0 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.evento-portada > .icono,
+.detalle-portada > .icono {
+  width: 56px;
+  height: 56px;
+  stroke-width: 1.5;
+  opacity: 0.7;
+}
+
+/* Las etiquetas flotan encima de la foto, arriba a la izquierda */
+.evento-etiquetas {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.evento-etiquetas .etiqueta {
+  margin-left: 0;
+}
+
+.evento-cuerpo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.evento-titulo {
+  display: block;
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.evento-linea {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0;
+}
+
+/* El cuadrito de fecha: número grande y mes chiquito */
+.fecha-evento {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.fecha-dia {
+  font-size: 20px;
+}
+
+.fecha-mes {
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* --- Detalle del evento --- */
+.detalle-portada {
+  height: 220px;
+  border-radius: 31px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.detalle-titulo {
+  margin-bottom: 16px;
+}
+
+.aviso-rojo {
+  background-color: rgba(211, 63, 73, 0.12);
+  border: 2px solid var(--error);
+}
+
+.info-evento {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.info-evento li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 15px;
+}
+
+.info-evento .icono {
+  width: 22px;
+  height: 22px;
+  color: var(--lila-fuerte);
+  margin-top: 1px;
+}
+
+.direccion-oculta {
+  font-style: italic;
+  color: #666;
+}
+
+.detalle-descripcion {
+  white-space: pre-line; /* respeta los saltos de línea que escribió el anfitrión */
+  font-size: 14px;
+  margin: 12px 0;
+}
+
+.anfitrion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--lila);
+}
+
+.anfitrion .nota {
+  margin: 0;
+}
+
+/* El mensaje que manda quien pide entrar */
+.burbuja {
+  background-color: var(--verde);
+  border-radius: 4px 16px 16px 16px; /* una esquina recta = forma de globo de chat */
+  padding: 8px 14px;
+  margin: 6px 0;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.fila-avatares {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.mini-invitado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 56px;
+  font-size: 11px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* En "Ver solicitudes", los botones pueden bajar debajo en celular */
+.solicitud {
+  flex-wrap: wrap;
+}
+
+/* --- Formulario de evento --- */
+.portada-previa {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 140px;
+  margin: 0 !important;
+  border-radius: 25px;
+  background-color: var(--blanco);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.portada-previa img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Público / Privado: radios escondidos y su texto con forma de pastilla */
+.selector-pastillas {
+  border: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.selector-pastillas legend {
+  font-size: 16px;
+  margin: 0 0 6px 12px;
+  padding: 0;
+}
+
+.pastillas {
+  display: flex;
+  gap: 8px;
+}
+
+.pastilla {
+  flex: 1;
+  margin: 0 !important;
+}
+
+.pastilla input {
+  position: absolute;
+  opacity: 0;
+}
+
+.pastilla span {
+  display: block;
+  padding: 10px;
+  text-align: center;
+  border-radius: 45px;
+  background-color: var(--blanco);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+/* :checked = el radio que está marcado. "+ span" = el span que va justo después */
+.pastilla input:checked + span {
+  background-color: var(--lila);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 2.5px var(--borde);
+}
+
+.pastilla input:focus-visible + span {
+  outline: 3px solid var(--lila-fuerte);
+}
+
+/* ---------- 10d. MENSAJES (CHAT) ---------- */
+
+.contador-lila {
+  background-color: var(--lila-fuerte);
+  color: var(--texto);
+}
+
+.acciones-izquierda {
+  justify-content: flex-start;
+}
+
+/* --- Bandeja --- */
+.lista-chats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.fila-chat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px;
+  border-radius: 11px;
+  text-decoration: none;
+}
+
+.fila-chat:hover {
+  background-color: #f4f3f7;
+}
+
+.lista-chats li + li {
+  border-top: 1px solid var(--lila);
+}
+
+.chat-cabecera-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* El último mensaje en una sola línea, con "..." si no cabe */
+.chat-preview {
+  font-size: 14px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Si hay mensajes sin leer, el nombre y el preview van en negrita */
+.no-leido .chat-preview {
+  color: var(--texto);
+  font-weight: 600;
+}
+
+/* --- Conversación --- */
+.chat-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.boton-volver-chico {
+  width: 44px;
+  height: 44px;
+}
+
+.boton-volver-chico .icono {
+  width: 28px;
+  height: 28px;
+}
+
+.chat-nombre {
+  font-size: 20px;
+}
+
+/* La zona de los globos: se puede scrollear sola, y la página no crece infinito */
+.chat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 55vh;
+  overflow-y: auto;
+  padding: 16px;
+  background-color: var(--blanco);
+  border-radius: 31px;
+  margin-bottom: 12px;
+}
+
+.chat-vacio {
+  margin: auto;
+}
+
+/* "hoy" / "ayer" en el medio, con una pastillita */
+.chat-dia {
+  text-align: center;
+  margin: 8px 0;
+}
+
+.chat-dia span {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background-color: var(--amarillo);
+  font-size: 12px;
+}
+
+/* Un globo de mensaje */
+.globo {
+  max-width: 78%;
+  padding: 8px 14px 6px;
+  font-size: 15px;
+  overflow-wrap: anywhere; /* un link larguísimo no rompe el diseño */
+}
+
+.globo p {
+  margin: 0;
+  white-space: pre-line; /* respeta los saltos de línea (Shift+Enter) */
+}
+
+/* Los MÍOS a la derecha, en verde lima, con la esquina de abajo-derecha recta */
+.globo-mio {
+  align-self: flex-end;
+  background-color: var(--verde);
+  border-radius: 18px 18px 4px 18px;
+}
+
+/* Los de la OTRA persona a la izquierda, en lila */
+.globo-otro {
+  align-self: flex-start;
+  background-color: var(--lila);
+  border-radius: 18px 18px 18px 4px;
+}
+
+.globo-hora {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  color: #555;
+  margin-top: 2px;
+}
+
+.globo-evento {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+
+/* La cajita para escribir + el botón redondo de enviar */
+.chat-escribir {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.chat-escribir textarea.input {
+  height: 52px;
+  min-height: 52px;
+  max-height: 140px;
+  padding: 14px 20px;
+  resize: none;
+}
+
+.boton-enviar {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--lila);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.boton-enviar .icono {
+  width: 24px;
+  height: 24px;
+}
+
 /* ---------- 11. RESPONSIVE: pantallas grandes ----------
    Todo lo de arriba es para celular. Aquí decimos:
    "si la pantalla mide 768px o más (tablet/compu), cambia esto". */
@@ -779,6 +1376,15 @@ select.input {
   /* En compu, los 4 números del dashboard van en una sola fila */
   .stats {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* En compu, las tarjetas de eventos van de a 2 */
+  .grilla-eventos {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .detalle-portada {
+    height: 300px;
   }
 }
 

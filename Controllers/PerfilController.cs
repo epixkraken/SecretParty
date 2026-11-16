@@ -37,6 +37,14 @@ namespace SecretParty.Controllers
         {
             var usuario = await ObtenerUsuarioActual();
             if (usuario == null) return RedirectToAction("Login", "Cuenta");
+
+            // El numerito de "Ver solicitudes": gente esperando entrar a mis hangs
+            var ahora = Fechas.Ahora;
+            ViewBag.Pendientes = await _db.Solicitudes.CountAsync(s =>
+                s.Evento!.AnfitrionId == usuario.Id && s.Estado == EstadoSolicitud.Pendiente
+                && s.Evento.FechaHora >= ahora && s.Evento.Estado == EstadoEvento.Activo);
+            ViewBag.NoLeidos = await _db.Mensajes.CountAsync(m => m.DestinatarioId == usuario.Id && !m.Leido);
+
             return View(usuario);
         }
 
@@ -137,7 +145,10 @@ namespace SecretParty.Controllers
             var usuario = await ObtenerUsuarioActual();
             if (usuario != null)
             {
-                _fotos.Borrar(usuario.FotoPerfil); // que la foto no quede huérfana en el disco
+                // Que las fotos no queden huérfanas en el disco (los eventos se borran solos por la cascada)
+                foreach (var portada in await _db.Eventos.Where(e => e.AnfitrionId == usuario.Id).Select(e => e.FotoPortada).ToListAsync())
+                    _fotos.Borrar(portada);
+                _fotos.Borrar(usuario.FotoPerfil);
                 _db.Usuarios.Remove(usuario);
                 await _db.SaveChangesAsync();
             }

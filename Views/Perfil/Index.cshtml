@@ -50,6 +50,39 @@
     <nav class="tarjeta">
         <ul class="menu">
             <li>
+                <a asp-controller="Eventos" asp-action="Index">
+                    <span class="menu-icono"><partial name="_Icono" model='"lupa"' /></span> Explorar
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Eventos" asp-action="MisHangs">
+                    <span class="menu-icono"><partial name="_Icono" model='"fiesta"' /></span> My Hangs
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Eventos" asp-action="Crear">
+                    <span class="menu-icono"><partial name="_Icono" model='"mas"' /></span> Nuevo Hang
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Mensajes" asp-action="Index">
+                    <span class="menu-icono"><partial name="_Icono" model='"mensaje"' /></span> Mensajes
+                    @if (ViewBag.NoLeidos > 0)
+                    {
+                        <span class="contador contador-lila">@ViewBag.NoLeidos</span>
+                    }
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Eventos" asp-action="Solicitudes">
+                    <span class="menu-icono"><partial name="_Icono" model='"buzon"' /></span> Ver solicitudes
+                    @if (ViewBag.Pendientes > 0)
+                    {
+                        <span class="contador">@ViewBag.Pendientes</span>
+                    }
+                </a>
+            </li>
+            <li>
                 <a asp-action="Editar">
                     <span class="menu-icono"><partial name="_Icono" model='"usuario"' /></span> Editar perfil
                 </a>

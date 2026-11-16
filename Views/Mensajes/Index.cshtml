@@ -1,0 +1,71 @@
+@model BandejaViewModel
+@{
+    ViewData["Title"] = "Mensajes";
+    ViewData["Ancho"] = "pantalla-ancha";
+}
+
+<h1 class="titulo">Mis <em>mensajes</em></h1>
+
+<partial name="_MenuApp" />
+
+@if (Model.Conversaciones.Count == 0 && Model.Contactos.Count == 0)
+{
+    <section class="tarjeta vacio">
+        <partial name="_Icono" model='"mensaje"' />
+        <p>Todavía no tienes conversaciones.</p>
+        <p class="nota">Cuando pidas entrar a un hang (o alguien pida entrar al tuyo), podrán escribirse aquí.</p>
+        <a asp-controller="Eventos" asp-action="Index" class="boton boton-lila boton-chico">Explorar hangs</a>
+    </section>
+}
+
+@if (Model.Conversaciones.Count > 0)
+{
+    <section class="tarjeta">
+        <ul class="lista-chats">
+            @foreach (var c in Model.Conversaciones)
+            {
+                <li>
+                    <a asp-action="Chat" asp-route-id="@c.Otro.Id" class="fila-chat @(c.NoLeidos > 0 ? "no-leido" : "")">
+                        <partial name="_Avatar" model="c.Otro" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+                        <div class="fila-datos">
+                            <div class="chat-cabecera-fila">
+                                <strong>@c.Otro.NombreUsuario</strong>
+                                <span class="nota">@HoraCorta(c.Ultimo.Fecha)</span>
+                            </div>
+                            <div class="chat-preview">
+                                @(c.UltimoEsMio ? "Tú: " : "")@c.Ultimo.Texto
+                            </div>
+                        </div>
+                        @if (c.NoLeidos > 0)
+                        {
+                            <span class="contador contador-lila">@c.NoLeidos</span>
+                        }
+                    </a>
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+@if (Model.Contactos.Count > 0)
+{
+    <section class="tarjeta">
+        <h2 class="subtitulo">Puedes escribirle a</h2>
+        <p class="nota">Gente con la que tienes un hang en común.</p>
+        <div class="fila-avatares">
+            @foreach (var u in Model.Contactos)
+            {
+                <a asp-action="Chat" asp-route-id="@u.Id" class="mini-invitado link-sin-linea" title="Escribirle a @u.NombreUsuario">
+                    <partial name="_Avatar" model="u" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+                    <span>@u.NombreUsuario</span>
+                </a>
+            }
+        </div>
+    </section>
+}
+
+@functions {
+    // Hoy -> "14:32"; otro día -> "3 nov"
+    string HoraCorta(DateTime fecha) =>
+        fecha.Date == Fechas.Ahora.Date ? fecha.ToString("HH:mm") : $"{fecha.Day} {Fechas.Mes(fecha)}";
+}

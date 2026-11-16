@@ -1,0 +1,61 @@
+@using System.Security.Claims
+@using Microsoft.EntityFrameworkCore
+@* @inject pide un servicio (aquí la base de datos) directamente desde la vista *@
+@inject SecretParty.Data.AppDbContext Db
+@*
+    Menú de pastillas de la parte social: Explorar | My Hangs | Nuevo Hang | Solicitudes | Perfil.
+    La pestaña activa se marca según el controlador y la acción actuales.
+*@
+@{
+    var controlador = ViewContext.RouteData.Values["controller"]?.ToString();
+    var accion = ViewContext.RouteData.Values["action"]?.ToString();
+    string Activa(string c, string a) => controlador == c && accion == a ? "activa" : "";
+
+    var esAdmin = User.IsInRole("Admin");
+    var miId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    var ahora = Fechas.Ahora;
+
+    // El numerito rojo: cuántas personas están esperando que les respondas
+    var pendientes = esAdmin ? 0 : await Db.Solicitudes.CountAsync(s =>
+        s.Evento!.AnfitrionId == miId && s.Estado == EstadoSolicitud.Pendiente
+        && s.Evento.FechaHora >= ahora && s.Evento.Estado == EstadoEvento.Activo);
+
+    // Mensajes que me mandaron y todavía no abro
+    var noLeidos = esAdmin ? 0 : await Db.Mensajes.CountAsync(m => m.DestinatarioId == miId && !m.Leido);
+}
+
+<nav class="menu-admin">
+    @if (esAdmin)
+    {
+        <a asp-controller="Admin" asp-action="Index">← Panel admin</a>
+    }
+    <a asp-controller="Eventos" asp-action="Index" class="@Activa("Eventos", "Index")">Explorar</a>
+    @if (!esAdmin)
+    {
+        <a asp-controller="Eventos" asp-action="MisHangs" class="@Activa("Eventos", "MisHangs")">My Hangs</a>
+    }
+    <a asp-controller="Eventos" asp-action="Crear" class="@Activa("Eventos", "Crear")">@(esAdmin ? "+ Evento oficial" : "+ Nuevo Hang")</a>
+    @if (!esAdmin)
+    {
+        <a asp-controller="Eventos" asp-action="Solicitudes" class="@Activa("Eventos", "Solicitudes")">
+            Solicitudes
+            @if (pendientes > 0)
+            {
+                <span class="contador">@pendientes</span>
+            }
+        </a>
+        <a asp-controller="Mensajes" asp-action="Index" class="@(controlador == "Mensajes" ? "activa" : "")">
+            Mensajes
+            @if (noLeidos > 0)
+            {
+                <span class="contador contador-lila">@noLeidos</span>
+            }
+        </a>
+        <a asp-controller="Perfil" asp-action="Index" class="@Activa("Perfil", "Index")">Perfil</a>
+    }
+</nav>
+
+@if (TempData["Mensaje"] != null)
+{
+    <p class="aviso">@TempData["Mensaje"]</p>
+}

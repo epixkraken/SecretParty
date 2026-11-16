@@ -50,6 +50,99 @@ namespace SecretParty.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SecretParty.Models.Evento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AnfitrionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Cupo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("EsOficial")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EsPublico")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaHora")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FotoPortada")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Zona")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnfitrionId");
+
+                    b.ToTable("Eventos");
+                });
+
+            modelBuilder.Entity("SecretParty.Models.Mensaje", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DestinatarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("EventoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Leido")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RemitenteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventoId");
+
+                    b.HasIndex("RemitenteId");
+
+                    b.HasIndex("DestinatarioId", "Leido");
+
+                    b.ToTable("Mensajes");
+                });
+
             modelBuilder.Entity("SecretParty.Models.MotivoReporte", b =>
                 {
                     b.Property<int>("Id")
@@ -155,6 +248,38 @@ namespace SecretParty.Migrations
                     b.ToTable("Reportes");
                 });
 
+            modelBuilder.Entity("SecretParty.Models.Solicitud", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EventoId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Mensaje")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.HasIndex("EventoId", "UsuarioId")
+                        .IsUnique();
+
+                    b.ToTable("Solicitudes");
+                });
+
             modelBuilder.Entity("SecretParty.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")
@@ -207,6 +332,43 @@ namespace SecretParty.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("SecretParty.Models.Evento", b =>
+                {
+                    b.HasOne("SecretParty.Models.Usuario", "Anfitrion")
+                        .WithMany()
+                        .HasForeignKey("AnfitrionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Anfitrion");
+                });
+
+            modelBuilder.Entity("SecretParty.Models.Mensaje", b =>
+                {
+                    b.HasOne("SecretParty.Models.Usuario", "Destinatario")
+                        .WithMany()
+                        .HasForeignKey("DestinatarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SecretParty.Models.Evento", "Evento")
+                        .WithMany()
+                        .HasForeignKey("EventoId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("SecretParty.Models.Usuario", "Remitente")
+                        .WithMany()
+                        .HasForeignKey("RemitenteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Destinatario");
+
+                    b.Navigation("Evento");
+
+                    b.Navigation("Remitente");
+                });
+
             modelBuilder.Entity("SecretParty.Models.MotivoReporte", b =>
                 {
                     b.HasOne("SecretParty.Models.CategoriaReporte", "Categoria")
@@ -237,9 +399,33 @@ namespace SecretParty.Migrations
                     b.Navigation("UsuarioReportado");
                 });
 
+            modelBuilder.Entity("SecretParty.Models.Solicitud", b =>
+                {
+                    b.HasOne("SecretParty.Models.Evento", "Evento")
+                        .WithMany("Solicitudes")
+                        .HasForeignKey("EventoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SecretParty.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Evento");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("SecretParty.Models.CategoriaReporte", b =>
                 {
                     b.Navigation("Motivos");
+                });
+
+            modelBuilder.Entity("SecretParty.Models.Evento", b =>
+                {
+                    b.Navigation("Solicitudes");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,6 +12,9 @@ namespace SecretParty.Data
         public DbSet<CategoriaReporte> CategoriasReporte { get; set; }
         public DbSet<MotivoReporte> MotivosReporte { get; set; }
         public DbSet<Reporte> Reportes { get; set; }
+        public DbSet<Evento> Eventos { get; set; }
+        public DbSet<Solicitud> Solicitudes { get; set; }
+        public DbSet<Mensaje> Mensajes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +28,56 @@ namespace SecretParty.Data
                 .WithMany()
                 .HasForeignKey(r => r.UsuarioReportadoId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Si se borra un usuario, se borran los eventos que organizaba
+            modelBuilder.Entity<Evento>()
+                .HasOne(e => e.Anfitrion)
+                .WithMany()
+                .HasForeignKey(e => e.AnfitrionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Si se borra un evento, se borran sus solicitudes
+            modelBuilder.Entity<Solicitud>()
+                .HasOne(s => s.Evento)
+                .WithMany(e => e.Solicitudes)
+                .HasForeignKey(s => s.EventoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Si se borra un usuario, se borran sus solicitudes
+            modelBuilder.Entity<Solicitud>()
+                .HasOne(s => s.Usuario)
+                .WithMany()
+                .HasForeignKey(s => s.UsuarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Una persona solo puede pedir UNA vez entrar al mismo evento
+            modelBuilder.Entity<Solicitud>()
+                .HasIndex(s => new { s.EventoId, s.UsuarioId })
+                .IsUnique();
+
+            // Mensajes: dos claves foráneas a la MISMA tabla (Usuarios), por eso hay que decir cuál es cuál.
+            // Si se borra cualquiera de los dos usuarios, sus mensajes se borran.
+            modelBuilder.Entity<Mensaje>()
+                .HasOne(m => m.Remitente)
+                .WithMany()
+                .HasForeignKey(m => m.RemitenteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Mensaje>()
+                .HasOne(m => m.Destinatario)
+                .WithMany()
+                .HasForeignKey(m => m.DestinatarioId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Si se borra el evento, el mensaje se queda pero ya no apunta a ningún evento (null)
+            modelBuilder.Entity<Mensaje>()
+                .HasOne(m => m.Evento)
+                .WithMany()
+                .HasForeignKey(m => m.EventoId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Índice para que buscar "mis mensajes" sea rápido
+            modelBuilder.Entity<Mensaje>().HasIndex(m => new { m.DestinatarioId, m.Leido });
 
             // Datos iniciales: la migración los inserta en la base
             modelBuilder.Entity<CategoriaReporte>().HasData(

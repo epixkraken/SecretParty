@@ -1,0 +1,84 @@
+@model ChatViewModel
+@{
+    ViewData["Title"] = $"Chat con {Model.Otro.NombreUsuario}";
+    ViewData["Ancho"] = "pantalla-ancha";
+    ViewData["Fondo"] = "fondo-liso";
+    DateTime? diaAnterior = null;
+}
+
+<partial name="_MenuApp" />
+
+<!-- Cabecera: volver + con quién hablo -->
+<div class="chat-cabecera">
+    <a asp-action="Index" class="boton-volver boton-volver-chico" title="Volver a mensajes"><partial name="_Icono" model='"volver"' /></a>
+    <partial name="_Avatar" model="Model.Otro" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
+    <div>
+        <strong class="chat-nombre">@Model.Otro.NombreUsuario</strong>
+        @if (Model.EventoEnComun != null)
+        {
+            <div class="nota">sobre: @Model.EventoEnComun</div>
+        }
+    </div>
+</div>
+
+@* data-* guardan datos para el JavaScript: con quién hablo y cuál es el último mensaje que ya tengo *@
+<div id="chat" class="chat"
+     data-otro="@Model.Otro.Id"
+     data-ultimo="@(Model.Mensajes.LastOrDefault()?.Id ?? 0)">
+
+    @if (Model.Mensajes.Count == 0)
+    {
+        <p class="nota centrado chat-vacio">Salúdale a @Model.Otro.NombreUsuario 👋</p>
+    }
+
+    @foreach (var m in Model.Mensajes)
+    {
+        @* Separador de día: "hoy", "ayer", "12 nov" *@
+        if (diaAnterior != m.Fecha.Date)
+        {
+            diaAnterior = m.Fecha.Date;
+            <div class="chat-dia"><span>@NombreDia(m.Fecha)</span></div>
+        }
+
+        var mio = m.RemitenteId == Model.MiId;
+        <div class="globo @(mio ? "globo-mio" : "globo-otro")">
+            @if (m.Evento != null)
+            {
+                <a asp-controller="Eventos" asp-action="Detalle" asp-route-id="@m.Evento.Id" class="globo-evento">🎉 @m.Evento.Titulo</a>
+            }
+            @* Razor escapa el texto: si alguien escribe <script>, se muestra como texto y no se ejecuta *@
+            <p>@m.Texto</p>
+            <span class="globo-hora">@m.Fecha.ToString("HH:mm")</span>
+        </div>
+    }
+    <div id="fin"></div>
+</div>
+
+@if (Model.PuedeEscribir)
+{
+    <form asp-action="Enviar" asp-route-id="@Model.Otro.Id" method="post" class="chat-escribir">
+        <textarea name="texto" class="input" rows="1" maxlength="@MensajesController.LargoMaximo"
+                  placeholder="Escribe un mensaje..." required id="texto-chat"></textarea>
+        <button type="submit" class="boton-enviar" title="Enviar">
+            <partial name="_Icono" model='"enviar"' />
+        </button>
+    </form>
+}
+else
+{
+    <p class="aviso">Ya no tienen un hang en común, así que no puedes escribirle más.</p>
+}
+
+@section Scripts {
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}
+
+@functions {
+    string NombreDia(DateTime fecha)
+    {
+        var hoy = Fechas.Ahora.Date;
+        if (fecha.Date == hoy) return "hoy";
+        if (fecha.Date == hoy.AddDays(-1)) return "ayer";
+        return $"{fecha.Day} {Fechas.Mes(fecha)}";
+    }
+}

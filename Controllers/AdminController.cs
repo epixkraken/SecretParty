@@ -46,9 +46,79 @@ namespace SecretParty.Controllers
                     .Include(r => r.Motivo).ThenInclude(m => m!.Categoria)
                     .OrderByDescending(r => r.Fecha)
                     .Take(5)
+                    .ToListAsync(),
+                EventosProximos = await _db.Eventos.CountAsync(e => e.Estado == EstadoEvento.Activo && e.FechaHora >= Fechas.Ahora),
+                ProximosEventos = await _db.Eventos
+                    .Where(e => e.Estado == EstadoEvento.Activo && e.FechaHora >= Fechas.Ahora)
+                    .OrderBy(e => e.FechaHora)
+                    .Take(5)
+                    .Select(e => new EventoTarjeta
+                    {
+                        Evento = e,
+                        Aceptados = e.Solicitudes.Count(s => s.Estado == EstadoSolicitud.Aceptada)
+                    })
                     .ToListAsync()
             };
             return View(model);
+        }
+
+        // ---------- EVENTOS (moderación) ----------
+        // GET: /Admin/Eventos?filtro=ocultos
+        public async Task<IActionResult> Eventos(string? filtro)
+        {
+            var consulta = _db.Eventos.Include(e => e.Anfitrion).AsQueryable();
+            var ahora = Fechas.Ahora;
+
+            consulta = filtro switch
+            {
+                "proximos" => consulta.Where(e => e.FechaHora >= ahora && e.Estado == EstadoEvento.Activo),
+                "oficiales" => consulta.Where(e => e.EsOficial),
+                "ocultos" => consulta.Where(e => e.Estado == EstadoEvento.Oculto),
+                "pasados" => consulta.Where(e => e.FechaHora < ahora),
+                _ => consulta
+            };
+
+            ViewBag.Filtro = filtro;
+            var filas = await consulta
+                .OrderByDescending(e => e.FechaHora)
+                .Select(e => new EventoTarjeta
+                {
+                    Evento = e,
+                    Aceptados = e.Solicitudes.Count(s => s.Estado == EstadoSolicitud.Aceptada)
+                })
+                .ToListAsync();
+            return View(filas);
+        }
+
+        // POST: /Admin/OcultarEvento/5  -> si está visible lo oculta; si está oculto lo vuelve a mostrar
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OcultarEvento(int id)
+        {
+            var evento = await _db.Eventos.FindAsync(id);
+            if (evento == null) return NotFound();
+
+            evento.Estado = evento.Estado == EstadoEvento.Oculto ? EstadoEvento.Activo : EstadoEvento.Oculto;
+            await _db.SaveChangesAsync();
+            TempData["Mensaje"] = evento.Estado == EstadoEvento.Oculto
+                ? $"\"{evento.Titulo}\" ya no aparece en Explorar."
+                : $"\"{evento.Titulo}\" vuelve a estar visible.";
+            return RedirectToAction(nameof(Eventos));
+        }
+
+        // POST: /Admin/EliminarEvento/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarEvento(int id)
+        {
+            var evento = await _db.Eventos.FindAsync(id);
+            if (evento == null) return NotFound();
+
+            _fotos.Borrar(evento.FotoPortada);
+            _db.Eventos.Remove(evento);
+            await _db.SaveChangesAsync();
+            TempData["Mensaje"] = $"Se eliminó \"{evento.Titulo}\".";
+            return RedirectToAction(nameof(Eventos));
         }
 
         // ---------- MI CUENTA ----------
@@ -157,6 +227,9 @@ namespace SecretParty.Controllers
                 return RedirectToAction(nameof(Usuarios));
             }
 
+            // Sus eventos se borran solos (cascada), pero las portadas están en el disco: las borramos a mano
+            foreach (var portada in await _db.Eventos.Where(e => e.AnfitrionId == id).Select(e => e.FotoPortada).ToListAsync())
+                _fotos.Borrar(portada);
             _fotos.Borrar(usuario.FotoPerfil);
             _db.Usuarios.Remove(usuario);
             await _db.SaveChangesAsync();

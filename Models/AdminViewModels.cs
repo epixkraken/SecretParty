@@ -10,6 +10,9 @@ namespace SecretParty.Models
         public int TotalReportes { get; set; }
         public int UsuariosEnRiesgo { get; set; }
         public List<Reporte> UltimosReportes { get; set; } = new();
+
+        public int EventosProximos { get; set; }
+        public List<EventoTarjeta> ProximosEventos { get; set; } = new();
     }
 
     // Una fila de la lista de usuarios, con cuántos flags tiene
