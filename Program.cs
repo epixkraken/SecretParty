@@ -23,6 +23,9 @@ builder.Services.AddScoped<Rastreador>();
 // (Vive en memoria: al reiniciar la app, el modo caos arranca apagado.)
 builder.Services.AddSingleton<Caos>();
 
+// Retry + Fallback (patrones del paper), con trazas de cada intento
+builder.Services.AddScoped<Resiliencia>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

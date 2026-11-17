@@ -16,10 +16,12 @@ namespace SecretParty.Controllers
         public const int LargoMaximo = 1000;
 
         private readonly AppDbContext _db;
+        private readonly Resiliencia _resiliencia;
 
-        public MensajesController(AppDbContext db)
+        public MensajesController(AppDbContext db, Resiliencia resiliencia)
         {
             _db = db;
+            _resiliencia = resiliencia;
         }
 
         private int MiId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -150,20 +152,26 @@ namespace SecretParty.Controllers
         public async Task<IActionResult> Nuevos(int id, int despuesDe)
         {
             var yo = MiId;
-            var nuevos = await _db.Mensajes
-                .Where(m => m.Id > despuesDe
-                         && ((m.RemitenteId == yo && m.DestinatarioId == id) || (m.RemitenteId == id && m.DestinatarioId == yo)))
-                .OrderBy(m => m.Id)
-                .Select(m => new
-                {
-                    id = m.Id,
-                    texto = m.Texto,
-                    mio = m.RemitenteId == yo,
-                    hora = m.Fecha.ToString("HH:mm")
-                })
-                .ToListAsync();
+            var sinConexion = false;
 
-            if (nuevos.Any(m => !m.mio))
+            // RETRY + FALLBACK: intenta leer la base hasta 3 veces.
+            // Si no se puede, plan B = responder "no hay nada nuevo" y avisarle al navegador.
+            var nuevos = await _resiliencia.EjecutarAsync("ChatNuevos",
+                "BaseDeDatos", () => _db.Mensajes
+                    .Where(m => m.Id > despuesDe
+                             && ((m.RemitenteId == yo && m.DestinatarioId == id) || (m.RemitenteId == id && m.DestinatarioId == yo)))
+                    .OrderBy(m => m.Id)
+                    .Select(m => new MensajeNuevo(m.Id, m.Texto, m.RemitenteId == yo, m.Fecha.ToString("HH:mm")))
+                    .ToListAsync(),
+                "ModoSinConexion", () =>
+                {
+                    sinConexion = true;
+                    return Task.FromResult(new List<MensajeNuevo>());
+                });
+
+            if (sinConexion)
+                Response.Headers["X-Sin-Conexion"] = "1"; // el JavaScript lee esto y muestra el aviso
+            else if (nuevos.Any(m => !m.Mio))
                 await MarcarLeidos(de: id, para: yo);
 
             return Json(nuevos);

@@ -52,4 +52,7 @@ namespace SecretParty.Models
         public bool PuedeEscribir { get; set; }
         public string? EventoEnComun { get; set; }
     }
+    
+    // Lo que el chat le manda al JavaScript cada pocos segundos
+    public record MensajeNuevo(int Id, string Texto, bool Mio, string Hora);
 }
