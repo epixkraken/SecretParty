@@ -190,10 +190,11 @@ else if (Model.YaPaso)
         @* ---------- AGREGAR A MI CALENDARIO (solo si veo la dirección y el hang sigue en pie) ---------- *@
         @if (activo && (Model.SoyAnfitrion || estado == EstadoSolicitud.Aceptada))
         {
-            var urlDetalle = Url.Action("Detalle", "Eventos", new { id = e.Id }, Context.Request.Scheme)!;
             <div class="agregar-calendario">
                 <span class="nota">Agregar a mi calendario:</span>
-                <a href="@CalendarioController.LinkGoogle(e, urlDetalle)" target="_blank" rel="noopener" class="filtro">Google Calendar</a>
+                @* Pasa por NUESTRO servidor (CalendarioController.Google): si Google falla,
+                   el FALLBACK descarga el archivo .ics como plan B *@
+                <a asp-controller="Calendario" asp-action="Google" asp-route-id="@e.Id" target="_blank" rel="noopener" class="filtro">Google Calendar</a>
                 <a asp-controller="Calendario" asp-action="Ics" asp-route-id="@e.Id" class="filtro">iPhone / Outlook (.ics)</a>
             </div>
         }

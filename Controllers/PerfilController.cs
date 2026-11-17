@@ -16,13 +16,14 @@ namespace SecretParty.Controllers
     {
         private readonly AppDbContext _db;
         private readonly AlmacenFotos _fotos;
+        private readonly Resiliencia _resiliencia;
 
-        public PerfilController(AppDbContext db, AlmacenFotos fotos)
+        public PerfilController(AppDbContext db, AlmacenFotos fotos, Resiliencia resiliencia)
         {
             _db = db;
             _fotos = fotos;
+            _resiliencia = resiliencia;
         }
-
         // Se ejecuta ANTES de cualquier acción de este controlador.
         // El admin no tiene perfil social: si intenta entrar aquí, lo mandamos a su panel.
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -102,11 +103,26 @@ namespace SecretParty.Controllers
             }
 
             // Foto nueva: guardamos la nueva y borramos la vieja del disco
-            if (model.Foto != null)
+                       if (model.Foto != null)
             {
                 var vieja = usuario.FotoPerfil;
-                usuario.FotoPerfil = await _fotos.Guardar(model.Foto, "perfiles");
-                _fotos.Borrar(vieja);
+                var archivo = model.Foto;
+
+                // RETRY + FALLBACK: intenta guardar la foto hasta 3 veces;
+                // si no se puede, plan B = quedarse con la foto que ya tenía
+                var nueva = await _resiliencia.EjecutarAsync<string?>("GuardarFoto",
+                    "AlmacenFotos", async () => await _fotos.Guardar(archivo, "perfiles"),
+                    "FotoAnterior", () => Task.FromResult(vieja));
+
+                if (nueva != vieja)
+                {
+                    usuario.FotoPerfil = nueva;
+                    _fotos.Borrar(vieja);
+                }
+                else
+                {
+                    TempData["Mensaje"] = "No pudimos guardar tu foto nueva 😕 Dejamos la anterior, intenta otra vez más tarde.";
+                }
             }
             else if (model.QuitarFoto)
             {

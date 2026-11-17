@@ -21,6 +21,8 @@
     </div>
 </div>
 
+@* Aviso del FALLBACK: lo muestra chat.js cuando no hay conexión *@
+<p id="aviso-conexion" class="aviso aviso-rojo" style="display:none"></p>
 @* data-* guardan datos para el JavaScript: con quién hablo y cuál es el último mensaje que ya tengo *@
 <div id="chat" class="chat"
      data-otro="@Model.Otro.Id"

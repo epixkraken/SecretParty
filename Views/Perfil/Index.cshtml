@@ -7,6 +7,11 @@
 
 <h1 class="titulo">Hola <em>@Model.NombreUsuario!</em></h1>
 
+@if (TempData["Mensaje"] != null)
+{
+    <p class="aviso aviso-rojo">@TempData["Mensaje"]</p>
+}
+
 <!-- Tarjeta principal: foto, nombre y descripción -->
 <section class="tarjeta">
     <div class="perfil-cabecera">

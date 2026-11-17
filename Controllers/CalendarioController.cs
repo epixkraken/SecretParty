@@ -15,10 +15,12 @@ namespace SecretParty.Controllers
     public class CalendarioController : Controller
     {
         private readonly AppDbContext _db;
+        private readonly Resiliencia _resiliencia;
 
-        public CalendarioController(AppDbContext db)
+        public CalendarioController(AppDbContext db, Resiliencia resiliencia)
         {
             _db = db;
+            _resiliencia = resiliencia;
         }
 
         private int MiId => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -110,6 +112,30 @@ namespace SecretParty.Controllers
             return File(bytes, "text/calendar", $"secret-party-{evento.Id}.ics");
         }
 
+                // GET: /Calendario/Google/5
+        // Abre Google Calendar con el hang ya llenado.
+        // FALLBACK: si Google "no responde" (modo caos), plan B = bajar el archivo .ics
+        public async Task<IActionResult> Google(int id)
+        {
+            var yo = MiId;
+            var evento = await _db.Eventos.FindAsync(id);
+            if (evento == null) return NotFound();
+
+            // Solo el anfitrión o un invitado ACEPTADO (el link trae la dirección secreta)
+            var puede = evento.AnfitrionId == yo
+                || await _db.Solicitudes.AnyAsync(s => s.EventoId == id && s.UsuarioId == yo && s.Estado == EstadoSolicitud.Aceptada);
+            if (!puede) return NotFound();
+
+            var urlDetalle = Url.Action("Detalle", "Eventos", new { id }, Request.Scheme)!;
+
+            var link = await _resiliencia.EjecutarAsync<string?>("AgregarCalendario",
+                "GoogleCalendar", () => Task.FromResult<string?>(LinkGoogle(evento, urlDetalle)),
+                "ArchivoIcs", () => Task.FromResult<string?>(null));
+
+            // Si hay link, vamos a Google; si no, plan B: descargar el .ics
+            return link != null ? Redirect(link) : RedirectToAction(nameof(Ics), new { id });
+        }
+        
         // Link que abre Google Calendar con el evento ya llenado (el usuario solo toca "Guardar")
         public static string LinkGoogle(Evento e, string urlDetalle)
         {

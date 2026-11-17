@@ -280,6 +280,52 @@ namespace SecretParty.Migrations
                     b.ToTable("Solicitudes");
                 });
 
+            modelBuilder.Entity("SecretParty.Models.Traza", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Detalle")
+                        .HasMaxLength(300)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("DuracionMs")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Operacion")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Peticion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Resultado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Servicio")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Fecha");
+
+                    b.HasIndex("Peticion");
+
+                    b.ToTable("Trazas");
+                });
+
             modelBuilder.Entity("SecretParty.Models.Usuario", b =>
                 {
                     b.Property<int>("Id")

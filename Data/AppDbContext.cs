@@ -15,9 +15,13 @@ namespace SecretParty.Data
         public DbSet<Evento> Eventos { get; set; }
         public DbSet<Solicitud> Solicitudes { get; set; }
         public DbSet<Mensaje> Mensajes { get; set; }
+        public DbSet<Traza> Trazas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+                        // Índices para buscar rápido las trazas de una petición y las más recientes
+            modelBuilder.Entity<Traza>().HasIndex(t => t.Peticion);
+            modelBuilder.Entity<Traza>().HasIndex(t => t.Fecha);
             // No pueden existir dos usuarios con el mismo email o nombre
             modelBuilder.Entity<Usuario>().HasIndex(u => u.Email).IsUnique();
             modelBuilder.Entity<Usuario>().HasIndex(u => u.NombreUsuario).IsUnique();

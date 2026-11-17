@@ -19,13 +19,16 @@ namespace SecretParty.Controllers
 
         private readonly AppDbContext _db;
         private readonly AlmacenFotos _fotos;
+        private readonly Caos _caos;
+        private readonly Rastreador _rastreador;
 
-        public AdminController(AppDbContext db, AlmacenFotos fotos)
+        public AdminController(AppDbContext db, AlmacenFotos fotos, Caos caos, Rastreador rastreador)
         {
             _db = db;
             _fotos = fotos;
+            _caos = caos;
+            _rastreador = rastreador;
         }
-
         // ---------- DASHBOARD ----------
         // GET: /Admin
         public async Task<IActionResult> Index()
@@ -293,7 +296,77 @@ namespace SecretParty.Controllers
             return Json(motivos);
         }
 
+        // ---------- OBSERVABILIDAD ----------
+        // GET: /Admin/Observabilidad  -> las trazas: qué pasó dentro de la app
+        // (idea del paper "Mining design patterns from distributed execution traces")
+        public async Task<IActionResult> Observabilidad()
+        {
+            ViewBag.Total = await _db.Trazas.CountAsync();
+            ViewBag.Fallas = await _db.Trazas.CountAsync(t => t.Resultado == ResultadoTraza.Falla);
+
+            // Las 100 más recientes (el Id más alto = la que pasó al último)
+            var ultimas = await _db.Trazas
+                .OrderByDescending(t => t.Id)
+                .Take(100)
+                .ToListAsync();
+            return View(ultimas);
+        }
+
         // Llena las listas de los 3 dropdowns
+                // ---------- MODO CAOS (inyección de fallas) ----------
+        // GET: /Admin/ModoCaos
+        public IActionResult ModoCaos() => View(_caos);
+
+        // POST: /Admin/ModoCaos  -> guarda la probabilidad de falla de cada servicio
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ModoCaos(Dictionary<string, int> probabilidades)
+        {
+            foreach (var servicio in Caos.ServiciosDisponibles)
+                _caos.Configurar(servicio, probabilidades.TryGetValue(servicio, out var p) ? p : 0);
+
+            TempData["Mensaje"] = _caos.Activo ? "Modo caos ACTIVADO 💥" : "Modo caos apagado.";
+            return RedirectToAction(nameof(ModoCaos));
+        }
+
+        // POST: /Admin/ApagarCaos  -> todo vuelve a la normalidad
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ApagarCaos()
+        {
+            _caos.ApagarTodo();
+            TempData["Mensaje"] = "Modo caos apagado.";
+            return RedirectToAction(nameof(ModoCaos));
+        }
+
+        // POST: /Admin/ProbarCaos  -> usa el servicio 10 veces y anota cada intento como traza
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProbarCaos(string servicio)
+        {
+            if (!Caos.ServiciosDisponibles.Contains(servicio)) return BadRequest();
+
+            var fallas = 0;
+            for (var i = 0; i < 10; i++)
+            {
+                try
+                {
+                    await _rastreador.MedirAsync("PruebaCaos", servicio, () =>
+                    {
+                        _caos.TalVezFallar(servicio);
+                        return Task.FromResult(true);
+                    });
+                }
+                catch (FallaInyectadaException)
+                {
+                    fallas++;
+                }
+            }
+
+            TempData["Mensaje"] = $"Probé {servicio} 10 veces: {fallas} fallaron. Míralo en Observabilidad.";
+            return RedirectToAction(nameof(ModoCaos));
+        }
+
         private async Task CargarDropdowns(NuevoReporteViewModel model)
         {
             ViewBag.Usuarios = new SelectList(

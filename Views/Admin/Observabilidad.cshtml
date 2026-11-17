@@ -1,0 +1,61 @@
+@model List<Traza>
+@{
+    ViewData["Title"] = "Observabilidad";
+    ViewData["Ancho"] = "pantalla-ancha";
+    int total = ViewBag.Total;
+    int fallas = ViewBag.Fallas;
+    // El código de petición es largo: mostramos solo el final
+    string Corto(string p) => p.Length > 8 ? p[^8..] : p;
+}
+
+<h1 class="titulo">Observa<em>bilidad</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<div class="stats">
+    <div class="stat">
+        <span class="stat-numero">@total</span>
+        <span class="stat-texto">trazas registradas</span>
+    </div>
+    <div class="stat">
+        <span class="stat-numero">@(total - fallas)</span>
+        <span class="stat-texto">funcionaron</span>
+    </div>
+    <div class="stat @(fallas > 0 ? "stat-alerta" : "")">
+        <span class="stat-numero">@fallas</span>
+        <span class="stat-texto">fallaron</span>
+    </div>
+</div>
+
+<section class="tarjeta">
+    <h2 class="subtitulo">Últimas trazas</h2>
+    <p class="nota">
+        Cada fila es un registro de qué pasó dentro de la app, como las trazas del paper.
+        Las filas con el mismo código de petición ocurrieron en la misma petición.
+    </p>
+
+    <ul class="lista-admin">
+        @foreach (var t in Model)
+        {
+            var fallo = t.Resultado == ResultadoTraza.Falla;
+            <li class="@(fallo ? "fila-riesgo" : "")">
+                <div class="fila-datos">
+                    <strong>@t.Operacion → @t.Servicio</strong>
+                    <span class="etiqueta @(fallo ? "etiqueta-roja" : "")">@(fallo ? "Falla" : "Éxito")</span>
+                    <div class="nota">
+                        @t.Fecha.ToString("dd/MM HH:mm:ss") · @t.DuracionMs ms · petición …@Corto(t.Peticion)
+                        @if (t.Detalle != null)
+                        {
+                            <text> · @t.Detalle</text>
+                        }
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+
+    @if (Model.Count == 0)
+    {
+        <p class="nota">Todavía no hay trazas. Inicia sesión (o equivócate de contraseña) y vuelve.</p>
+    }
+</section>

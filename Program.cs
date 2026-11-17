@@ -13,6 +13,19 @@ options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
 // Nuestro servicio para guardar/borrar fotos. "Scoped" = uno nuevo por cada petición.
 // Los controladores lo reciben en su constructor (inyección de dependencias), igual que AppDbContext.
 builder.Services.AddScoped<AlmacenFotos>();
+
+// Trazas (paper de patrones de diseño): anota qué pasó en cada petición
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Rastreador>();
+
+// Inyector de fallas. "Singleton" = UNO solo para toda la app,
+// así lo que el admin configura vale para todas las peticiones.
+// (Vive en memoria: al reiniciar la app, el modo caos arranca apagado.)
+builder.Services.AddSingleton<Caos>();
+
+// Retry + Fallback (patrones del paper), con trazas de cada intento
+builder.Services.AddScoped<Resiliencia>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
