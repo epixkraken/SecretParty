@@ -1,0 +1,76 @@
+@model SecretParty.Servicios.Caos
+@{
+    ViewData["Title"] = "Modo caos";
+    ViewData["Ancho"] = "pantalla-ancha";
+    int[] opciones = { 0, 50, 100 };
+
+    string Descripcion(string s) => s switch
+    {
+        "BaseDeDatos" => "Cuando el chat busca mensajes nuevos",
+        "GoogleCalendar" => "El botón \"Agregar a Google Calendar\"",
+        "AlmacenFotos" => "Guardar la foto de perfil",
+        _ => ""
+    };
+}
+
+<h1 class="titulo">Modo <em>caos</em></h1>
+
+<partial name="_MenuAdmin" />
+
+<section class="tarjeta">
+    <h2 class="subtitulo">
+        Inyectar fallas
+        @if (Model.Activo)
+        {
+            <span class="etiqueta etiqueta-roja">ACTIVO</span>
+        }
+        else
+        {
+            <span class="etiqueta">apagado</span>
+        }
+    </h2>
+    <p class="nota">
+        Como en el paper: hacemos fallar partes de la app a propósito y después miramos
+        en Observabilidad cómo reaccionó (si reintentó o si usó un plan B).
+    </p>
+
+    <form asp-action="ModoCaos" method="post">
+        <ul class="lista-admin">
+            @foreach (var s in SecretParty.Servicios.Caos.ServiciosDisponibles)
+            {
+                <li>
+                    <div class="fila-datos">
+                        <strong>@s</strong>
+                        <div class="nota">@Descripcion(s)</div>
+                    </div>
+                    <div class="fila-acciones">
+                        <select name="@($"probabilidades[{s}]")" class="input">
+                            @foreach (var o in opciones)
+                            {
+                                <option value="@o" selected="@(Model.Probabilidad(s) == o)">@o % de fallas</option>
+                            }
+                        </select>
+                    </div>
+                </li>
+            }
+                </ul>
+        <div class="acciones">
+            <button type="submit" class="boton boton-lila">Guardar</button>
+            @* Mismo formulario, pero este botón manda a otra acción (ApagarCaos) *@
+            <button type="submit" asp-action="ApagarCaos" class="boton boton-borde">Apagar todo</button>
+        </div>
+    </form>
+</section>
+<section class="tarjeta">
+    <h2 class="subtitulo">Probar</h2>
+    <p class="nota">Usa el servicio 10 veces seguidas. Cada intento queda como traza en Observabilidad.</p>
+    <div class="fila-acciones">
+        @foreach (var s in SecretParty.Servicios.Caos.ServiciosDisponibles)
+        {
+            <form asp-action="ProbarCaos" method="post" class="form-en-linea">
+                <input type="hidden" name="servicio" value="@s" />
+                <button type="submit" class="boton boton-chico">Probar @s</button>
+            </form>
+        }
+    </div>
+</section>

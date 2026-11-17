@@ -18,6 +18,11 @@ builder.Services.AddScoped<AlmacenFotos>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<Rastreador>();
 
+// Inyector de fallas. "Singleton" = UNO solo para toda la app,
+// así lo que el admin configura vale para todas las peticiones.
+// (Vive en memoria: al reiniciar la app, el modo caos arranca apagado.)
+builder.Services.AddSingleton<Caos>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

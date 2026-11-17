@@ -1,3 +1,4 @@
+@inject SecretParty.Servicios.Caos Caos
 @* Menú de pestañas del admin. La pestaña activa se marca según la acción actual. *@
 @{
     var accion = ViewContext.RouteData.Values["action"]?.ToString();
@@ -10,6 +11,7 @@
     <a asp-action="Eventos" class="@Activa("Eventos")">Eventos</a>
     <a asp-action="NuevoReporte" class="@Activa("NuevoReporte")">Flaguear perfil</a>
     <a asp-action="Observabilidad" class="@Activa("Observabilidad")">Observabilidad</a>
+    <a asp-action="ModoCaos" class="@Activa("ModoCaos")">Modo caos @(Caos.Activo ? "💥" : "")</a>
     <a asp-action="MiCuenta" class="@Activa("MiCuenta")">Mi cuenta</a>
     <form asp-controller="Cuenta" asp-action="Logout" method="post" class="form-en-linea">
         <button type="submit" class="boton boton-verde boton-chico">Sign Out</button>
