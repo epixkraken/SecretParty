@@ -293,6 +293,22 @@ namespace SecretParty.Controllers
             return Json(motivos);
         }
 
+        // ---------- OBSERVABILIDAD ----------
+        // GET: /Admin/Observabilidad  -> las trazas: qué pasó dentro de la app
+        // (idea del paper "Mining design patterns from distributed execution traces")
+        public async Task<IActionResult> Observabilidad()
+        {
+            ViewBag.Total = await _db.Trazas.CountAsync();
+            ViewBag.Fallas = await _db.Trazas.CountAsync(t => t.Resultado == ResultadoTraza.Falla);
+
+            // Las 100 más recientes (el Id más alto = la que pasó al último)
+            var ultimas = await _db.Trazas
+                .OrderByDescending(t => t.Id)
+                .Take(100)
+                .ToListAsync();
+            return View(ultimas);
+        }
+
         // Llena las listas de los 3 dropdowns
         private async Task CargarDropdowns(NuevoReporteViewModel model)
         {

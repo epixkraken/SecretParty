@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SecretParty.Data;
 using SecretParty.Models;
+using SecretParty.Servicios;
 
 namespace SecretParty.Controllers
 {
@@ -13,10 +14,12 @@ namespace SecretParty.Controllers
     {
         private readonly AppDbContext _db;
         private readonly PasswordHasher<Usuario> _hasher = new();
+        private readonly Rastreador _rastreador;
 
-        public CuentaController(AppDbContext db)
+        public CuentaController(AppDbContext db, Rastreador rastreador)
         {
             _db = db;
+            _rastreador = rastreador;
         }
 
         // ---------- REGISTRO ----------
@@ -81,11 +84,16 @@ namespace SecretParty.Controllers
                 _hasher.VerifyHashedPassword(usuario, usuario.PasswordHash, model.Password)
                     == PasswordVerificationResult.Failed)
             {
+                // TRAZA: el login falló
+                await _rastreador.RegistrarAsync("Login", "Autenticacion", ResultadoTraza.Falla,
+                    "Email o contraseña incorrectos");
                 ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos");
                 return View(model);
             }
 
             await IniciarSesion(usuario);
+            // TRAZA: el login funcionó
+            await _rastreador.RegistrarAsync("Login", "Autenticacion", ResultadoTraza.Exito);
 
             // este es el que redirige 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))

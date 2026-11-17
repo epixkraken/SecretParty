@@ -13,6 +13,11 @@ options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
 // Nuestro servicio para guardar/borrar fotos. "Scoped" = uno nuevo por cada petición.
 // Los controladores lo reciben en su constructor (inyección de dependencias), igual que AppDbContext.
 builder.Services.AddScoped<AlmacenFotos>();
+
+// Trazas (paper de patrones de diseño): anota qué pasó en cada petición
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Rastreador>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
