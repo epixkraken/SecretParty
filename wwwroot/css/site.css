@@ -908,11 +908,13 @@ button.boton-icono {
   opacity: 0.6;
 }
 
-/* La foto de portada. Si no hay foto, un degradado lila -> verde con el icono de fiesta */
+/* La foto de portada. Si no hay foto, un degradado lila -> verde con el icono de fiesta.
+   aspect-ratio 1/1 = SIEMPRE cuadrada: el alto se calcula solo a partir del ancho
+   (antes tenía un alto fijo y en pantallas anchas quedaba como una tira). */
 .evento-portada,
 .detalle-portada {
   position: relative;
-  height: 150px;
+  aspect-ratio: 1 / 1;
   background: linear-gradient(135deg, var(--lila), var(--verde));
   display: flex;
   align-items: center;
@@ -989,10 +991,11 @@ button.boton-icono {
 
 /* --- Detalle del evento --- */
 .detalle-portada {
-  height: 220px;
+  width: 100%;
+  max-width: 460px; /* en compu no queremos un cuadrado gigante: tope y centrada */
+  margin: 0 auto 16px;
   border-radius: 31px;
   overflow: hidden;
-  margin-bottom: 16px;
 }
 
 .detalle-titulo {
@@ -1086,8 +1089,10 @@ button.boton-icono {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  height: 140px;
-  margin: 0 !important;
+  aspect-ratio: 1 / 1; /* cuadrada, igual que se verá en la tarjeta */
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto !important;
   border-radius: 25px;
   background-color: var(--blanco);
   overflow: hidden;
@@ -1529,13 +1534,9 @@ button.boton-icono {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  /* En compu, las tarjetas de eventos van de a 2 */
+  /* En compu, las tarjetas de eventos van de a 2 (cuadrados de ~370px) */
   .grilla-eventos {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .detalle-portada {
-    height: 300px;
   }
 
   /* En compu el calendario tiene espacio: celdas altas, sin puntitos y con chips de texto */
