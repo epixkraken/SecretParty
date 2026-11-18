@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Copa de martini: hang PÚBLICO -->
+  <path d="M22 2.5 15.5 13" fill="none" stroke="#120000" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M4.5 5.5h23L16 17.5z" fill="#d6c9fe" stroke="#120000" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="11.5" cy="9" r="1.8" fill="#e0feca" stroke="#120000" stroke-width="1"/>
+  <path d="M16 17.5v9.5" stroke="#120000" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M10 28.5h12" stroke="#120000" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M12 28.5h8" stroke="#e0feca" stroke-width="0.9" stroke-linecap="round"/>
+</svg>

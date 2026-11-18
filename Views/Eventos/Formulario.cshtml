@@ -66,6 +66,32 @@
         <span asp-validation-for="Descripcion" class="error"></span>
     </div>
 
+    @* SE ESCUCHA: buscador de canciones (API de iTunes, a través de /Eventos/BuscarCancion).
+       El input de búsqueda NO tiene name, así que no se manda: lo que se guarda son los 4 campos escondidos. *@
+    <div class="campo" id="campo-cancion">
+        <label for="buscar-cancion">Se escucha 🎶 <span class="nota">(opcional)</span></label>
+
+        <input type="hidden" asp-for="CancionTitulo" />
+        <input type="hidden" asp-for="CancionArtista" />
+        <input type="hidden" asp-for="CancionPortada" />
+        <input type="hidden" asp-for="CancionPreview" />
+
+        <!-- La canción elegida (si hay) -->
+        <div id="cancion-elegida" class="cancion-elegida" hidden="@string.IsNullOrEmpty(Model.CancionTitulo)">
+            <img src="@Model.CancionPortada" alt="" class="cancion-portada" />
+            <div class="cancion-texto">
+                <strong class="cancion-titulo">@Model.CancionTitulo</strong>
+                <span class="cancion-artista">@Model.CancionArtista</span>
+            </div>
+            <button type="button" class="boton-icono" id="quitar-cancion" title="Quitar canción"><partial name="_Icono" model='"x"' /></button>
+        </div>
+
+        <input type="search" id="buscar-cancion" class="input" placeholder="Busca una canción o artista..."
+               autocomplete="off" maxlength="80" />
+        <ul id="resultados-cancion" class="resultados-cancion" hidden></ul>
+        <span asp-validation-for="CancionTitulo" class="error"></span>
+    </div>
+
     <div class="campo">
         <label asp-for="FechaHora"></label>
         @* type="datetime-local" = el navegador muestra un selector de fecha Y hora *@
@@ -127,4 +153,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/cancion.js" asp-append-version="true"></script>
 }

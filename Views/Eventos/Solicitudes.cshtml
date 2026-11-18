@@ -42,7 +42,7 @@ else
                             }
                             @if (!string.IsNullOrEmpty(s.Usuario.Intereses))
                             {
-                                <div class="nota">Le gusta: @s.Usuario.Intereses</div>
+                                <div class="hobbies-chicos"><partial name="_Hobbies" model="s.Usuario.Intereses" /></div>
                             }
                         </div>
                         <div class="fila-acciones">

@@ -1156,6 +1156,330 @@ button.boton-icono {
   outline: 3px solid var(--lila-fuerte);
 }
 
+/* --- Mapa "¿qué pasa cerca?" --- */
+.mapa {
+  height: 62vh;
+  min-height: 360px;
+  border-radius: 31px;
+  overflow: hidden;
+  border: 2.5px solid var(--borde);
+  z-index: 0; /* que los controles de Leaflet no se pongan encima del menú */
+}
+
+/* Las baldosas un poco desaturadas, para que se parezca al mapa grisecito del Figma
+   y resalten los iconitos lilas */
+.mapa .leaflet-tile-pane {
+  filter: grayscale(0.55) brightness(1.05);
+}
+
+.pin-oficial {
+  filter: drop-shadow(0 0 4px #f2e15c) drop-shadow(0 0 2px #f2e15c);
+}
+
+.mapa-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin: 12px 4px 20px;
+  font-size: 14px;
+}
+
+.mapa-leyenda span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mapa-leyenda img {
+  width: 26px;
+  height: 26px;
+}
+
+.mapa-leyenda .nota {
+  flex-basis: 100%;
+}
+
+/* El globito al tocar un iconito */
+.popup-hang {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: "Poppins", Arial, sans-serif;
+  min-width: 170px;
+}
+
+.popup-hang strong {
+  font-size: 15px;
+}
+
+.popup-hang .boton {
+  margin-top: 6px;
+  text-align: center;
+  color: var(--texto);
+}
+
+.mapa .leaflet-popup-content-wrapper {
+  border-radius: 18px;
+}
+
+/* El logo tiene fondo BLANCO. multiply "multiplica" sus colores con los del fondo:
+   el blanco desaparece y se ve el fondo de la página detrás, como si fuera transparente. */
+.logo-esquina {
+  height: 70px;
+  width: auto;
+  mix-blend-mode: multiply;
+}
+
+/* Botones + / − del zoom: los estilos generales de links del sitio los deformaban.
+   Aquí los dejamos como pastillitas blancas con borde negro. */
+.mapa .leaflet-bar {
+  border: 2px solid var(--borde);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.mapa .leaflet-bar a,
+.mapa .leaflet-bar a:hover {
+  display: block;
+  width: 34px;
+  height: 34px;
+  line-height: 32px;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  background-color: var(--blanco);
+  color: var(--texto);
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.mapa .leaflet-bar a:hover {
+  background-color: var(--lila);
+}
+
+.mapa .leaflet-bar a + a {
+  border-top: 1px solid var(--borde);
+}
+
+/* --- Canción ("se escucha") --- */
+/* Tarjetita: portada cuadrada + título y artista */
+.cancion-elegida {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background-color: var(--blanco);
+  border-radius: 18px;
+}
+
+/* OJO: display:flex le gana al atributo hidden, así que hay que volver a esconderlo a mano */
+.cancion-elegida[hidden],
+.resultados-cancion[hidden] {
+  display: none;
+}
+
+.cancion-portada {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  object-fit: cover;
+  background-color: var(--lila);
+}
+
+.cancion-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* deja que el texto largo se corte con "..." */
+  flex: 1;
+}
+
+.cancion-titulo,
+.cancion-artista {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cancion-titulo {
+  font-size: 15px;
+}
+
+.cancion-artista {
+  font-size: 13px;
+  color: #555;
+}
+
+/* La lista de resultados del buscador */
+.resultados-cancion {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 6px;
+  background-color: var(--blanco);
+  border-radius: 18px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.resultado-cancion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.resultado-cancion:hover,
+.resultado-cancion:focus-visible {
+  background-color: var(--lila);
+}
+
+.resultado-cancion .cancion-portada {
+  width: 44px;
+  height: 44px;
+}
+
+.resultado-mensaje {
+  padding: 8px 10px;
+}
+
+/* En el detalle del hang */
+.se-escucha {
+  margin: 12px 0 16px;
+  padding: 12px;
+  border-radius: 20px;
+  background-color: var(--lila);
+}
+
+.se-escucha .cancion-elegida {
+  margin-bottom: 10px;
+}
+
+.se-escucha-titulo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px 4px;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.se-escucha-titulo .icono {
+  width: 18px;
+  height: 18px;
+}
+
+.cancion-audio {
+  display: block;
+  width: 100%;
+  height: 36px;
+}
+
+/* --- Hobbies --- */
+/* La lista de pastillitas: se acomodan en filas y bajan solas cuando no caben (flex-wrap) */
+.hobbies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* En el perfil: verde lima como en el Figma */
+.hobby {
+  padding: 3px 16px;
+  border-radius: 999px;
+  background-color: var(--verde);
+  font-size: 15px;
+}
+
+.hobbies-perfil {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--lila);
+}
+
+.hobbies-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 400;
+  margin: 0 0 10px;
+}
+
+/* El perrito de globo (imagen PNG con fondo blanco: multiply lo hace "transparente") */
+.hobbies-icono {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+/* En "Ver solicitudes", más chiquitas */
+.hobbies-chicos {
+  margin-top: 6px;
+}
+
+.hobbies-chicos .hobby {
+  font-size: 12px;
+  padding: 1px 10px;
+}
+
+/* En el formulario: checkbox escondido + pastilla blanca; marcada = lila con borde */
+.hobbies-grupo {
+  font-size: 13px;
+  margin: 12px 0 6px 12px;
+  color: #555;
+}
+
+.hobby-check {
+  margin: 0 !important;
+}
+
+.hobby-check input {
+  position: absolute;
+  opacity: 0;
+}
+
+.hobby-check span {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background-color: var(--blanco);
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s;
+}
+
+.hobby-check input:checked + span {
+  background-color: var(--lila);
+  box-shadow: inset 0 0 0 2px var(--borde);
+  font-weight: 600;
+}
+
+.hobby-bloqueado span {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hobby-check input:focus-visible + span {
+  outline: 3px solid var(--lila-fuerte);
+}
+
 /* ---------- 10d. MENSAJES (CHAT) ---------- */
 
 .contador-lila {
@@ -1311,22 +1635,32 @@ button.boton-icono {
 /* La cajita para escribir + el botón redondo de enviar */
 .chat-escribir {
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  align-items: center;
+  gap: 14px; /* la cajita y el botón van separados, cada uno sobre el fondo */
 }
 
+/* Cajita bajita: 1 línea de 20px + 12px arriba y abajo = 44px.
+   overflow hidden = sin barra de scroll fea; chat.js la hace crecer sola si escribes mucho. */
 .chat-escribir textarea.input {
-  height: 52px;
-  min-height: 52px;
-  max-height: 140px;
-  padding: 14px 20px;
+  height: 44px;
+  min-height: 44px;
+  max-height: 120px;
+  padding: 11px 20px;
+  line-height: 20px;
+  border-width: 2px;
   resize: none;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.chat-escribir textarea.input:focus {
+  box-shadow: 0 0 0 3px var(--lila);
 }
 
 .boton-enviar {
   flex-shrink: 0;
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   border: none;
   border-radius: 50%;
   background-color: var(--lila);

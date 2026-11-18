@@ -19,7 +19,9 @@ namespace SecretParty.Models
         [Display(Name = "Fecha de nacimiento")]
         public DateTime? FechaNacimiento { get; set; }
 
-        public string? Intereses { get; set; }
+        // Los checkboxes del formulario se llaman todos name="Intereses":
+        // ASP.NET junta los que están marcados en esta lista automáticamente (model binding).
+        public List<string> Intereses { get; set; } = new();
 
         public string? Instagram { get; set; }
 

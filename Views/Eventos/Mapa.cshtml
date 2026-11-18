@@ -1,0 +1,46 @@
+@model List<PuntoMapa>
+@{
+    ViewData["Title"] = "¿Qué pasa cerca?";
+    ViewData["Ancho"] = "pantalla-ancha";
+    ViewData["Fondo"] = "fondo-liso";
+}
+
+@section Head {
+    @* Leaflet: librería gratis de mapas (con los mapas de OpenStreetMap, sin API key).
+       integrity = huella SHA-256 del archivo: si alguien lo cambiara en el CDN, el navegador NO lo carga. *@
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+}
+
+<partial name="_MenuApp" />
+
+<h1 class="titulo">¿qué pasa <em>cerca?</em></h1>
+
+<div id="mapa" class="mapa" aria-label="Mapa de hangs en Quito"></div>
+
+<!-- Leyenda -->
+<div class="mapa-leyenda">
+    <span><img src="~/img/pin-coctel.svg" alt="" /> público</span>
+    <span><img src="~/img/pin-candado.svg" alt="" /> privado</span>
+    <span class="nota">Los puntos son aproximados: la dirección exacta es secreta 🤫</span>
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="aviso">Todavía no hay hangs próximos. ¡Crea el primero!</p>
+}
+
+@* Los datos van como JSON dentro de un <script type="application/json"> (el navegador NO lo ejecuta).
+   Json.Serialize escapa los < y >, así un título con "</script>" no puede romper la página. *@
+<script type="application/json" id="puntos-mapa">@Html.Raw(Json.Serialize(Model))</script>
+
+<div class="barra-abajo">
+    <a asp-action="Index" class="boton-volver" title="Volver a Explorar"><partial name="_Icono" model='"volver"' /></a>
+    <img src="~/img/logo-copa.png" alt="Secret Party" class="logo-esquina" />
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="~/js/mapa.js" asp-append-version="true"></script>
+}

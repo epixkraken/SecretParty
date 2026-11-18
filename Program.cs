@@ -26,6 +26,10 @@ builder.Services.AddSingleton<Caos>();
 // Retry + Fallback (patrones del paper), con trazas de cada intento
 builder.Services.AddScoped<Resiliencia>();
 
+// Buscador de canciones (API de iTunes). AddHttpClient nos da un HttpClient bien manejado
+// (reusa conexiones). Timeout corto: si Apple tarda más de 5 s, cuenta como falla y se reintenta.
+builder.Services.AddHttpClient<BuscadorCanciones>(c => c.Timeout = TimeSpan.FromSeconds(5));
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

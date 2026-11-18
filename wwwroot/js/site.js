@@ -22,3 +22,21 @@ document.querySelectorAll("input[type=file][data-vista-previa]").forEach(functio
     img.src = url;
   });
 });
+
+// ---------- MÁXIMO 10 HOBBIES ----------
+// Cuando ya marcaste 10, los demás se bloquean (el servidor igual lo revisa por si acaso).
+(function () {
+  var checks = document.querySelectorAll(".hobby-check input");
+  if (checks.length === 0) return;
+  var MAXIMO = 10;
+
+  function revisar() {
+    var marcados = document.querySelectorAll(".hobby-check input:checked").length;
+    checks.forEach(function (c) {
+      c.disabled = !c.checked && marcados >= MAXIMO;
+      c.parentElement.classList.toggle("hobby-bloqueado", c.disabled);
+    });
+  }
+  checks.forEach(function (c) { c.addEventListener("change", revisar); });
+  revisar();
+})();

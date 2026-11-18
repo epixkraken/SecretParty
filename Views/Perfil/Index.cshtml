@@ -38,10 +38,6 @@
                 <dd>@(Model.FechaNacimiento?.ToString("dd/MM/yyyy") ?? "—")</dd>
             </div>
             <div>
-                <dt>Intereses</dt>
-                <dd>@(Model.Intereses ?? "—")</dd>
-            </div>
-            <div>
                 <dt>Instagram</dt>
                 <dd>@(Model.Instagram ?? "—")</dd>
             </div>
@@ -50,6 +46,12 @@
                 <dd>@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd>
             </div>
         </dl>
+
+        <!-- Hobbies como pastillitas verdes, igual que en el Figma -->
+        <div class="hobbies-perfil">
+            <h3 class="hobbies-titulo"><img src="~/img/globo-perro.png" alt="" class="hobbies-icono" /> Hobbies</h3>
+            <partial name="_Hobbies" model="Model.Intereses" />
+        </div>
     </section>
 
     <nav class="tarjeta">
@@ -57,6 +59,11 @@
             <li>
                 <a asp-controller="Eventos" asp-action="Index">
                     <span class="menu-icono"><partial name="_Icono" model='"lupa"' /></span> Explorar
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Eventos" asp-action="Mapa">
+                    <span class="menu-icono"><partial name="_Icono" model='"mapa"' /></span> ¿Qué pasa cerca?
                 </a>
             </li>
             <li>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Candado-corazón: hang PRIVADO -->
+  <path d="M10.5 14V9.5a5.5 5.5 0 0 1 11 0V14" fill="none" stroke="#120000" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M16 30s-11-6-11-13a5.3 5.3 0 0 1 11-2.2A5.3 5.3 0 0 1 27 17c0 7-11 13-11 13z" fill="#d6c9fe" stroke="#120000" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="16" cy="19.5" r="1.9" fill="#120000"/>
+  <path d="M16 20.5v3.5" stroke="#120000" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

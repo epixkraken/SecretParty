@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    @* Una vista puede meter CSS extra aquí con @section Head { ... } (ej: el mapa usa el de Leaflet) *@
+    @await RenderSectionAsync("Head", required: false)
 </head>
 <!-- Cada vista puede elegir su fondo con ViewData["Fondo"]; si no dice nada, usa el patrón -->
 <body class="@(ViewData["Fondo"] ?? "fondo-patron")">

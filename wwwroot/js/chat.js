@@ -96,6 +96,17 @@
         if (texto.value.trim() !== "") texto.form.submit();
       }
     });
+
+    // La cajita crece sola mientras escribes (hasta 120px, como dice el CSS).
+    // Solo cuando ya no cabe más, se prende la barra de scroll.
+    var ALTO_MAXIMO = 120;
+    function ajustarAlto() {
+      texto.style.height = "auto";                       // primero la achicamos...
+      var alto = Math.min(texto.scrollHeight + 4, ALTO_MAXIMO); // ...y medimos lo que ocupa el texto (+4 del borde)
+      texto.style.height = alto + "px";
+      texto.style.overflowY = texto.scrollHeight + 4 > ALTO_MAXIMO ? "auto" : "hidden";
+    }
+    texto.addEventListener("input", ajustarAlto);
     texto.focus();
   }
 })();

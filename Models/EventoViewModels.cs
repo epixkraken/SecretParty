@@ -43,6 +43,25 @@ namespace SecretParty.Models
 
         public string? FotoActual { get; set; }
         public bool QuitarFoto { get; set; }
+
+        // La canción elegida en el buscador (van en campos escondidos que llena el JavaScript)
+        [StringLength(200)] public string? CancionTitulo { get; set; }
+        [StringLength(200)] public string? CancionArtista { get; set; }
+        [StringLength(400)] public string? CancionPortada { get; set; }
+        [StringLength(400)] public string? CancionPreview { get; set; }
+    }
+
+    // Un iconito en el mapa. A propósito NO tiene Direccion: esto viaja al navegador como JSON.
+    public class PuntoMapa
+    {
+        public int Id { get; set; }
+        public string Titulo { get; set; } = string.Empty;
+        public string Zona { get; set; } = string.Empty;
+        public string Fecha { get; set; } = string.Empty;
+        public bool EsPublico { get; set; }
+        public bool EsOficial { get; set; }
+        public double Lat { get; set; }
+        public double Lng { get; set; }
     }
 
     // Una tarjetita de evento en las listas (Explorar, My Hangs)

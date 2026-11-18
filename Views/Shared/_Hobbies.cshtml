@@ -1,0 +1,22 @@
+@model string?
+@*
+    Pastillitas verdes con los hobbies de una persona.
+    Uso: <partial name="_Hobbies" model="usuario.Intereses" />
+    El texto viene de la base como "baile, música, vinilos" y Hobbies.Separar lo parte.
+*@
+@{
+    var lista = Hobbies.Separar(Model);
+}
+@if (lista.Count == 0)
+{
+    <p class="nota">Todavía no hay hobbies</p>
+}
+else
+{
+    <ul class="hobbies">
+        @foreach (var h in lista)
+        {
+            <li class="hobby">@h</li>
+        }
+    </ul>
+}

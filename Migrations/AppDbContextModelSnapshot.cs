@@ -59,6 +59,22 @@ namespace SecretParty.Migrations
                     b.Property<int>("AnfitrionId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CancionArtista")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CancionPortada")
+                        .HasMaxLength(400)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CancionPreview")
+                        .HasMaxLength(400)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CancionTitulo")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Cupo")
                         .HasColumnType("INTEGER");
 

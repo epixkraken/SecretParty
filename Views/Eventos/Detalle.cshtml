@@ -82,6 +82,27 @@ else if (Model.YaPaso)
             <p class="detalle-descripcion">@e.Descripcion</p>
         }
 
+        @* SE ESCUCHA: la canción del hang (datos de iTunes) *@
+        @if (!string.IsNullOrEmpty(e.CancionTitulo))
+        {
+            <div class="se-escucha">
+                <span class="se-escucha-titulo"><partial name="_Icono" model='"musica"' /> se escucha</span>
+                <div class="cancion-elegida">
+                    <img src="@e.CancionPortada" alt="Portada de @e.CancionTitulo" class="cancion-portada" referrerpolicy="no-referrer" />
+                    <div class="cancion-texto">
+                        <strong class="cancion-titulo">@e.CancionTitulo</strong>
+                        <span class="cancion-artista">@e.CancionArtista</span>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(e.CancionPreview))
+                {
+                    @* preload="none": el audio NO se descarga hasta que le das play (ahorra datos) *@
+                    <audio controls preload="none" src="@e.CancionPreview" class="cancion-audio"></audio>
+                    <span class="ayuda">Preview de 30 s · iTunes</span>
+                }
+            </div>
+        }
+
         <div class="anfitrion">
             <partial name="_Avatar" model="e.Anfitrion!" view-data='new ViewDataDictionary(ViewData) { ["Clase"] = "avatar-chico" }' />
             <div>

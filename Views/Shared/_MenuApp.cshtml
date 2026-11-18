@@ -30,6 +30,7 @@
         <a asp-controller="Admin" asp-action="Index">← Panel admin</a>
     }
     <a asp-controller="Eventos" asp-action="Index" class="@Activa("Eventos", "Index")">Explorar</a>
+    <a asp-controller="Eventos" asp-action="Mapa" class="@Activa("Eventos", "Mapa")">Mapa</a>
     @if (!esAdmin)
     {
         <a asp-controller="Eventos" asp-action="MisHangs" class="@Activa("Eventos", "MisHangs")">My Hangs</a>

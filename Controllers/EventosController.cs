@@ -14,11 +14,13 @@ namespace SecretParty.Controllers
     {
         private readonly AppDbContext _db;
         private readonly AlmacenFotos _fotos;
+        private readonly BuscadorCanciones _canciones;
 
-        public EventosController(AppDbContext db, AlmacenFotos fotos)
+        public EventosController(AppDbContext db, AlmacenFotos fotos, BuscadorCanciones canciones)
         {
             _db = db;
             _fotos = fotos;
+            _canciones = canciones;
         }
 
         // El Id de quien está usando la app, sacado de la cookie (nunca de la URL)
@@ -54,6 +56,49 @@ namespace SecretParty.Controllers
                 Tipo = tipo,
                 Eventos = await ATarjetas(consulta).ToListAsync()
             });
+        }
+
+        // ================= MAPA: "¿qué pasa cerca?" =================
+        // GET: /Eventos/Mapa
+        // PRIVACIDAD: NO ponemos el pin en la dirección real (sería regalar la dirección de un hang privado).
+        // Cada hang sale en un punto "al azar" alrededor de Quito. El azar usa el Id como semilla,
+        // así el mismo hang siempre cae en el mismo lugar (no salta cada vez que recargas).
+        public async Task<IActionResult> Mapa()
+        {
+            var ahora = Fechas.Ahora;
+            var eventos = await _db.Eventos
+                .Where(e => e.Estado == EstadoEvento.Activo && e.FechaHora >= ahora)
+                .OrderBy(e => e.FechaHora)
+                .Take(100)
+                .ToListAsync();
+
+            // Solo mandamos al navegador lo que se puede ver en público: NUNCA la dirección
+            var puntos = eventos.Select(e => new PuntoMapa
+            {
+                Id = e.Id,
+                Titulo = e.Titulo,
+                Zona = e.Zona,
+                Fecha = Fechas.Corta(e.FechaHora),
+                EsPublico = e.EsPublico,
+                EsOficial = e.EsOficial,
+                Lat = CentroQuito.Lat + (Azar(e.Id, 1) - 0.5) * 0.07,  // ~±4 km norte-sur
+                Lng = CentroQuito.Lng + (Azar(e.Id, 2) - 0.5) * 0.04,  // ~±2 km este-oeste (Quito es alargado)
+            }).ToList();
+
+            return View(puntos);
+        }
+
+        private static readonly (double Lat, double Lng) CentroQuito = (-0.1807, -78.4678);
+
+        // Un número "al azar" entre 0 y 1 que SIEMPRE es el mismo para el mismo Id (función hash "splitmix64").
+        // No usamos new Random(id): con Ids seguidos (1, 2, 3) daba números casi iguales y los pines salían en fila.
+        private static double Azar(int id, ulong sal)
+        {
+            ulong z = (ulong)id * 0x9E3779B97F4A7C15UL + sal * 0xD1B54A32D192ED03UL;
+            z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9UL;
+            z = (z ^ (z >> 27)) * 0x94D049BB133111EBUL;
+            z ^= z >> 31;
+            return (z >> 11) * (1.0 / (1UL << 53)); // los 53 bits de arriba -> double entre 0 y 1
         }
 
         // ================= MY HANGS =================
@@ -178,7 +223,11 @@ namespace SecretParty.Controllers
                 Direccion = evento.Direccion,
                 Cupo = evento.Cupo,
                 EsPublico = evento.EsPublico,
-                FotoActual = evento.FotoPortada
+                FotoActual = evento.FotoPortada,
+                CancionTitulo = evento.CancionTitulo,
+                CancionArtista = evento.CancionArtista,
+                CancionPortada = evento.CancionPortada,
+                CancionPreview = evento.CancionPreview
             });
         }
 
@@ -428,6 +477,19 @@ namespace SecretParty.Controllers
             });
         }
 
+        // ================= BUSCAR CANCIÓN =================
+        // GET: /Eventos/BuscarCancion?q=miel   -> lo llama el JavaScript del formulario
+        // Devuelve JSON: [{ titulo, artista, portada, preview }, ...]
+        [HttpGet]
+        public async Task<IActionResult> BuscarCancion(string? q)
+        {
+            q = q?.Trim();
+            if (string.IsNullOrEmpty(q) || q.Length < 2 || q.Length > 80)
+                return Json(Array.Empty<Cancion>());
+
+            return Json(await _canciones.Buscar(q));
+        }
+
         // Reglas que no se pueden expresar solo con [Required] / [Range]
         private void ValidarFormulario(EventoFormViewModel model)
         {
@@ -443,10 +505,23 @@ namespace SecretParty.Controllers
                 if (errorFoto != null)
                     ModelState.AddModelError(nameof(model.Foto), errorFoto);
             }
+
+            // La canción: los links tienen que ser de Apple (nadie puede colar otro link editando el HTML)
+            if (!BuscadorCanciones.EsLinkDeApple(model.CancionPortada) || !BuscadorCanciones.EsLinkDeApple(model.CancionPreview))
+                ModelState.AddModelError(nameof(model.CancionTitulo), "Elige la canción desde el buscador");
         }
 
         private static void CopiarDatos(EventoFormViewModel model, Evento evento)
         {
+            // Canción: o viene completa (título + artista + portada), o no hay canción
+            var hayCancion = !string.IsNullOrWhiteSpace(model.CancionTitulo)
+                          && !string.IsNullOrWhiteSpace(model.CancionArtista)
+                          && !string.IsNullOrWhiteSpace(model.CancionPortada);
+            evento.CancionTitulo = hayCancion ? model.CancionTitulo!.Trim() : null;
+            evento.CancionArtista = hayCancion ? model.CancionArtista!.Trim() : null;
+            evento.CancionPortada = hayCancion ? model.CancionPortada : null;
+            evento.CancionPreview = hayCancion ? model.CancionPreview : null;
+
             evento.Titulo = model.Titulo.Trim();
             evento.Descripcion = model.Descripcion?.Trim();
             evento.FechaHora = model.FechaHora!.Value;

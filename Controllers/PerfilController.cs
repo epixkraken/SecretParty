@@ -62,10 +62,11 @@ namespace SecretParty.Controllers
                 NombreUsuario = usuario.NombreUsuario,
                 Descripcion = usuario.Descripcion,
                 FechaNacimiento = usuario.FechaNacimiento,
-                Intereses = usuario.Intereses,
+                Intereses = Hobbies.Separar(usuario.Intereses),
                 Instagram = usuario.Instagram,
                 FotoActual = usuario.FotoPerfil
             };
+            ViewBag.HobbiesAnteriores = model.Intereses;
             return View(model);
         }
 
@@ -90,8 +91,12 @@ namespace SecretParty.Controllers
                     ModelState.AddModelError(nameof(model.Foto), errorFoto);
             }
 
+            if (model.Intereses.Count > Hobbies.Maximo)
+                ModelState.AddModelError(nameof(model.Intereses), $"Elige máximo {Hobbies.Maximo} hobbies");
+
             // Si volvemos al formulario, que siga mostrando la foto que ya tenía
             model.FotoActual = usuario.FotoPerfil;
+            ViewBag.HobbiesAnteriores = Hobbies.Separar(usuario.Intereses);
 
             if (!ModelState.IsValid) return View(model);
 
@@ -133,7 +138,8 @@ namespace SecretParty.Controllers
             usuario.NombreUsuario = model.NombreUsuario;
             usuario.Descripcion = model.Descripcion;
             usuario.FechaNacimiento = model.FechaNacimiento;
-            usuario.Intereses = model.Intereses;
+            // Solo los del catálogo (o los que ya tenía escritos de antes)
+            usuario.Intereses = Hobbies.Limpiar(model.Intereses, Hobbies.Separar(usuario.Intereses));
             usuario.Instagram = model.Instagram;
             await _db.SaveChangesAsync();
 

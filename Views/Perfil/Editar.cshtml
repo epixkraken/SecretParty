@@ -31,10 +31,44 @@
         <span asp-validation-for="FechaNacimiento" class="error"></span>
     </div>
 
-    <div class="campo">
-        <label asp-for="Intereses"></label>
-        <input asp-for="Intereses" class="input" placeholder="música, karaoke, playa..." />
-    </div>
+    @* HOBBIES: checkboxes escondidos + su texto con forma de pastilla.
+       Todos se llaman name="Intereses": el servidor recibe la lista de los marcados. *@
+    @{
+        var anteriores = (ViewBag.HobbiesAnteriores as List<string>) ?? new List<string>();
+        var extras = anteriores.Where(a => !Hobbies.Todos.Contains(a)).ToList();
+    }
+    <fieldset class="selector-pastillas">
+        <legend>Hobbies <span class="nota">(elige hasta @Hobbies.Maximo)</span></legend>
+        <span asp-validation-for="Intereses" class="error"></span>
+
+        @foreach (var grupo in Hobbies.Catalogo)
+        {
+            <p class="hobbies-grupo">@grupo.Key</p>
+            <div class="hobbies">
+                @foreach (var h in grupo.Value)
+                {
+                    <label class="hobby-check">
+                        <input type="checkbox" name="Intereses" value="@h" checked="@Model.Intereses.Contains(h)" />
+                        <span>@h</span>
+                    </label>
+                }
+            </div>
+        }
+
+        @if (extras.Count > 0)
+        {
+            <p class="hobbies-grupo">Los que ya tenías</p>
+            <div class="hobbies">
+                @foreach (var h in extras)
+                {
+                    <label class="hobby-check">
+                        <input type="checkbox" name="Intereses" value="@h" checked="@Model.Intereses.Contains(h)" />
+                        <span>@h</span>
+                    </label>
+                }
+            </div>
+        }
+    </fieldset>
 
     <div class="campo">
         <label asp-for="Instagram"></label>

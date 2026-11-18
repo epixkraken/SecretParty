@@ -43,6 +43,16 @@ namespace SecretParty.Models
 
         public string? FotoPortada { get; set; }
 
+        // "Se escucha": la canción del hang (sale de la API de iTunes). Todo opcional.
+        [StringLength(200)]
+        public string? CancionTitulo { get; set; }
+        [StringLength(200)]
+        public string? CancionArtista { get; set; }
+        [StringLength(400)]
+        public string? CancionPortada { get; set; }   // link a la carátula (servidor de Apple)
+        [StringLength(400)]
+        public string? CancionPreview { get; set; }   // link al audio de 30 s (servidor de Apple)
+
         public EstadoEvento Estado { get; set; } = EstadoEvento.Activo;
 
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
